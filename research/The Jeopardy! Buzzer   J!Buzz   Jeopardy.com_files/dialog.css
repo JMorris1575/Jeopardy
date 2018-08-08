@@ -1,0 +1,95 @@
+/* DIALOG MODAL */
+#dialog_mask {
+	position:fixed;
+	top:0;
+	bottom:0;
+	left:0;
+	right:0;
+	background:rgba(0,0,0,.75);
+	z-index: 99999;
+}
+	#dialog_mask .dialog {
+		position:absolute;
+		top:50%;
+		left:50%;
+		width:90%;
+		max-width:30em;
+		text-align:center;
+		font-size:1.5rem;
+		color:#303030;
+		line-height:1.25em;
+		background:#ffffff;
+		padding:3em;
+		-webkit-transform: translate(-50%, -50%);
+		-moz-transform: translate(-50%, -50%);
+		-ms-transform: translate(-50%, -50%);
+		-o-transform: translate(-50%, -50%);
+		transform: translate(-50%, -50%);
+	}
+		#dialog_mask .dialog p {
+			margin:1em 0;
+			line-height: 1.25em;
+		}
+		#dialog_mask .dialog h2 {
+			color:#0073bb;
+			text-transform: uppercase;
+			font-size:3rem;
+			line-height: 1.25em;
+			font-family: 'DinCon';
+			font-weight: bold;
+		}
+		#dialog_mask .dialog input,
+		#dialog_mask .dialog select {
+			position: relative;
+			display: block;
+			margin: 1em auto;
+			width: 20em;
+			font-size: 1em;
+			padding: .5em;
+			background: #ffffff;
+			color: #000000;
+			border: 2px solid #d7d7d7;
+			border-radius: 0;
+			-webkit-appearance: textfield;
+		}
+			#dialog_mask .dialog select {
+				background-image: url('/Assets/jeopardy/images/global/arrow_black_down.png');
+				background-repeat: no-repeat;
+				background-position: 97% center;
+				background-size: .7em;
+			}
+		#dialog_mask .dialog button {
+			margin:.5em;
+			padding:.75em 2.5em;
+			text-decoration:none;
+			text-transform:uppercase;
+			line-height:1em;
+			display:inline-block;
+			cursor:pointer;
+			background:#0073bb;
+			color: #ffffff;
+			border: 0px none;
+			border-radius: 5px;
+			font-size: 1em;
+			font-family: 'DinConMedium';
+		}
+		#dialog_mask .dialog button.close {
+			position: absolute;
+			display: block;
+			top:10px;
+			right:10px;
+			background: url(/Assets/jeopardy/images/global/modal-close.png) no-repeat;
+			background-color:transparent;
+			text-indent: 999em;
+			white-space: nowrap;
+			overflow: hidden;
+			width: 37px;
+			height: 38px;
+			z-index: 100;
+			border: none;
+			box-shadow: none;
+			content: 'X';
+			padding:0;
+			margin:0;
+		}
+/* END DIALOG MODAL */

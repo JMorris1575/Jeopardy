@@ -1,0 +1,3 @@
+answers are called "clues"
+questions are called "responses"
+the button is called the buzzer, using it is called "buzzing in"
