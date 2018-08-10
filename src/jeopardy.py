@@ -17,12 +17,21 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
         # class variables (is class variables the correct name?)
         self.game = Game()
         self.game_pathname = ""
+        #:todo: figure out how to draw the board here - maybe see what was done in CardTablePractice - self.drawBoard(self.game)
+        # self.updateBoard()
+        # self.view.setScene((self.scene))
+
+    # def updateBoard(self):
+    #     item_list = self.scene.items()
+    #     print(len(item_list))
+    #     for item in item_list:
+    #         print(item)
 
 
     def file_open(self):
         print("Got to file_open.")
         print("Opening temporary game file: 'temp_saved_game'")
-        self.game.read_game('temp_saved_game')
+        self.game.read_game('temp_saved_game')  # this doesn't keep the opened game - needs to say something = self.game.read_game(<filename>)
         self.game.playable = True
         print("The game is marked playable = ", self.game.playable)
         self.setProgramState(ProgramState.Editing)
@@ -30,6 +39,7 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
     def file_create(self):
         print("Got to file_create.")
         self.setProgramState(ProgramState.Editing)
+        self.category_displays[3].display_state = DisplayState.Category
 
     def file_close(self):
         print("Got to file_close.")
@@ -66,6 +76,7 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
 
     def game_names(self):
         print("Got to game_names.")
+        self.clue_displays[3][3].clue = "Once upon a time"
 
     def game_practice(self):
         print("Got to game_practice.")

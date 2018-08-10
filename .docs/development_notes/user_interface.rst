@@ -156,3 +156,65 @@ Desires and Requirements for the Board Elements
 
 That's all I can think of for now.
 
+Board Element (Display Unit) Design
+-----------------------------------
+
+Thinking about how the BoardElement class is going to be used brings the following questions and ideas:
+
+#. Is BoardElement really a good name for the class?
+#. I foresee the use of several class variables for the different texts to be displayed: categories, dollar/point
+   amounts, clues and correct responses.
+#. I foresee the use of a method, or perhaps several methods, to display each of those texts, or no text when the
+   square is inactive.
+#. I still don't know if the class should try to expand itself or if the view should zoom in on it. Would it become
+   pixellated?
+
+Let's try different names for the class: BoardScreen, TVScreen, BoardUnit, BoardSquare, ClueSquare, DisplaySquare,
+DisplayUnit...
+
+I think I like that last one!
+
+So here is a plan for the ``DisplayUnit`` class:
+
+Can be instantiated by:
+
+    ``something = DisplayUnit(size)`` and filled in later.
+
+    Or ``something = DisplayUnit(size, type=DisplayType())`` and filled in later.
+
+    Or even ``something = DisplayUnit(size, type=DisplayType(), category_text="text", category_explanation="text",``
+        ``amount=200, amount_type = AmountType(), clue="text", correct_response="text")`` some or all of the arguments
+        can be filled in -- though not all of them would make sense together.
+
+Internally, the class will have a ``background_image`` to display, a ``black_text`` and a ``white_text`` both of which
+are QGraphicsTextItem()s
+
+Display Unit Implementation
+---------------------------
+
+I think I've got it working the way I want, and I learned some things along the way -- or re-learned them. First, a
+class derived from QGraphicsItem must draw itself in its reimplemented ``paint()`` method. That is how the
+QGraphicsScene or the QGraphicsView, whichever one actually draws the item, knows how to draw it.
+
+I've changed some names of things, hopefully to something more fitting to their function. Instead of "Board Element" I
+am now calling the individual mock TV screens of the Jeopardy! board "Display Units." The QGrapicsTextItems within each
+DisplayUnit are now called ``_shadow_text`` and ``_foreground_text`` instead of ``black_text`` and ``white_text``.
+
+Here is a table of variables and their use:
+
+.. csv-table::
+    :header: Variable, Usage
+    :widths: 20, 60
+
+    type, the type of DisplayElement -- example: element.type = DisplayType.Category
+    category_text, the text normally displayed in a category element -- example: element.category_text = "Hello World!"
+    category_explanation, the text viewed when the explanation of a category is displayed -- example: like the above
+    amount, the integer number of points (or dollars) this element is worth: element.amount = 200
+    clue, the text to be displayed as the clue: element.clue = "I am a clue."
+    correct_response, text to be displayed as the correct response to the clue: element.correct_response = "Who am I"
+    display_state, the state of the display: element.display_state = DisplayState.Blank (see list of states below.)
+
+Enums
+-----
+
+

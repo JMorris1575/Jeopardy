@@ -120,16 +120,23 @@ class JeopardyUI(object):
 
         self.category_displays = []
         for col in range(6):
-            element = BoardScreen(size)
+            element = DisplayUnit(size, type=DisplayType.Category)
             element.setPos(col * (size.width() + gap), 0)
+            element.category_text = "This is a Category"
+            element.category_explanation = "This is the explanation of the Category"
+            element.display_state = DisplayState.Waiting
             self.category_displays.append(element)
             self.scene.addItem(element)
-        self.clue_displays = [[]]
+        self.clue_displays = []
         for col in range(6):
+            row_list = []
             for row in range(5):
-                row_list = []
-                element = BoardScreen(size)
+                element = DisplayUnit(size, DisplayType.Clue)
                 element.setPos(col * (size.width() + gap), size.height() + 2 * gap + row * (size.height() + gap))
+                element.clue = "This is the Clue"
+                element.correct_response = "This is the Correct Response"
+                element.amount = 200
+                element.display_state = DisplayState.Dollars
                 self.scene.addItem(element)
                 row_list.append(element)
             self.clue_displays.append(row_list)
