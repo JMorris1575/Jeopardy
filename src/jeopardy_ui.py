@@ -6,15 +6,15 @@ from graphic_objects import *
 
 class JeopardyUI(object):
 
-    def getElementSize(self):
-        desktop = self.app.desktop()
-        screenNumber = desktop.screenNumber(self)  # gets the screen the form is on
-        screenGeometry = desktop.availableGeometry(screenNumber)  # as a QRect
-        element_width = screenGeometry.width() * 0.1  # calculates 10% of the available height
-        element_height = element_width * 9/16       # maintain a 16:9 aspect ratio
-        return QSizeF(element_width, element_height)
+    # def getElementSize(self):
+    #     desktop = self.app.desktop()
+    #     screenNumber = desktop.screenNumber(self)  # gets the screen the form is on
+    #     screenGeometry = desktop.availableGeometry(screenNumber)  # as a QRect
+    #     element_width = screenGeometry.width() * 0.1  # calculates 10% of the available height
+    #     element_height = element_width * 9/16       # maintain a 16:9 aspect ratio
+    #     return QSizeF(element_width, element_height)
 
-    def createUI(self, callerObject):
+    def createUI(self, screenGeometry):
 
         ##########################################
         #                                        #
@@ -113,33 +113,35 @@ class JeopardyUI(object):
 
         self.scene = QGraphicsScene()
         self.scene.setBackgroundBrush(Qt.black)
+        self.board = Board(screenGeometry, self.scene)
 
-        desktop = self.app.desktop()
-        size = self.getElementSize()
-        gap = size.width()/20
 
-        self.category_displays = []
-        for col in range(6):
-            element = DisplayUnit(size, type=DisplayType.Category)
-            element.setPos(col * (size.width() + gap), 0)
-            element.category_text = "This is a Category"
-            element.category_explanation = "This is the explanation of the Category"
-            element.display_state = DisplayState.Waiting
-            self.category_displays.append(element)
-            self.scene.addItem(element)
-        self.clue_displays = []
-        for col in range(6):
-            row_list = []
-            for row in range(5):
-                element = DisplayUnit(size, DisplayType.Clue)
-                element.setPos(col * (size.width() + gap), size.height() + 2 * gap + row * (size.height() + gap))
-                element.clue = "This is the Clue"
-                element.correct_response = "This is the Correct Response"
-                element.amount = 200
-                element.display_state = DisplayState.Dollars
-                self.scene.addItem(element)
-                row_list.append(element)
-            self.clue_displays.append(row_list)
+        # desktop = self.app.desktop()
+        # size = self.getElementSize()
+        # gap = size.width()/20
+        #
+        # self.category_displays = []
+        # for col in range(6):
+        #     element = DisplayUnit(size, type=DisplayType.Category)
+        #     element.setPos(col * (size.width() + gap), 0)
+        #     element.category_text = "This is a Category"
+        #     element.category_explanation = "This is the explanation of the Category"
+        #     element.display_state = DisplayState.Waiting
+        #     self.category_displays.append(element)
+        #     self.scene.addItem(element)
+        # self.clue_displays = []
+        # for col in range(6):
+        #     row_list = []
+        #     for row in range(5):
+        #         element = DisplayUnit(size, DisplayType.Clue)
+        #         element.setPos(col * (size.width() + gap), size.height() + 2 * gap + row * (size.height() + gap))
+        #         element.clue = "This is the Clue"
+        #         element.correct_response = "This is the Correct Response"
+        #         element.amount = 200
+        #         element.display_state = DisplayState.Dollars
+        #         self.scene.addItem(element)
+        #         row_list.append(element)
+        #     self.clue_displays.append(row_list)
 
         self.view = QGraphicsView()
         self.view.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)

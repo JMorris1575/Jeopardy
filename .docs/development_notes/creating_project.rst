@@ -73,6 +73,8 @@ I got the warning, again, about using an outdated versin of pip (version 10) and
 18 but, again, following the instructions led to errors. It must be some kind of mistake, though. Would they jump up to
 version 18 already?
 
+.. _installing_sphinx:
+
 Installing Sphinx
 -----------------
 
@@ -98,4 +100,98 @@ the resulting folder right away and, when I tried to open it next noticed it was
 it noticed I was trying to open a directory with files in it, it asked if I wanted to use them in the project. I did.
 
 I don't know why or how but it all seems to be working now: the program works, and the ugly red highlights are gone.
+
+Cloning the Project to South Haven
+==================================
+
+I documented my process fairly carefully this time for future reference.
+
+New Versions
+------------
+
+PyCharm needed to be updated to version 2018.2.1.
+
+The PyCharm plugin ``.ignore`` also wanted to be updated so I did.
+
+Then I went to ``python.org`` and downloaded Python 3.7. The options I selected were to "Install Launcher for all Users"
+and "Add Python37 to PATH." I selected "Install Now" rather than the custom configuration. This installed Python 3.7 at:
+
+``C:/Users/frjam_000/AppData/Local/Programs/Python/Python37``
+
+Creating the Environment
+------------------------
+
+PyCharm started up in the last program I was working on, confirmation2018. To create the ``jprd`` environment using
+Python 3.7 I performed the following steps.
+
+#. Went to File->Settings->Project Interpreter->Gear->Add...
+#. Left New Environment checked
+#. Set the location to ``C:\Users\frjam_000\Envs\jprd``
+#. Selected the base interpreter as ``C:/Users/frjam_000/AppData/Local/Programs/Python/Python37``
+#. Clicked Ok.
+#. Back in the main dialog I restored confirmation2018's setting to ``Python 3.6 (conf)(1)``
+
+Installing PyQt5 and Sphinx
+---------------------------
+
+In PyCharm's terminal::
+
+    workon jprd
+    pip install pyqt5
+    pip install sphinx
+
+It gave me the usual warning it's been giving lately:
+
+    ``You are using pip version 10.0.1, however version 18.0 is available...``
+
+and I ignored it. It does look like there is a version 18.0, they are using a calendar versioning system now,
+(see https://calver.org) but I haven't been able to get it to install on other machines and haven't tried on this one.
+Maybe it's because version 18.0 and version 10.0.1 are really the same version. This isn't really  a problem, so I'll
+deal with it later.
+
+Cloning the Jeopardy Project
+----------------------------
+
+In PyCharm:
+
+    VCS->Git->Clone...
+
+I copy/pasted ``https://github/JMorris/Jeopardy`` into the URL edit box.
+I changed the directory to:
+
+``C:\Users\frjam_000\Documents\PyCharm Projects\JeopardyProject``
+
+and clicked the Clone button.
+
+I said "Yes" when it asked if I wanted to open that directory and opened it in a new window.
+
+Configuration in PyCharm
+------------------------
+
+It works out to be best to go to File->Settings->Project Interpreter in order to add a new configuration. Once there I
+clicked on the interpreter drop-down and selected "Show all..."
+
+From there I clicked on the "+" button, checked "Existing Environment", clicked on the "..." button and navigated to
+the ``python.exe`` file in the environment:
+
+``C:\Users\frjam_000\Envs\jprd\Scripts\python.exe``
+
+I clicked "Ok" and, back in the Settings dialog I clicked on Project Structure in order to select the ``src`` directory
+to be for Sources.
+
+When I clicked "Ok" again, and waited for two processes to complete, I clicked on the "Add Configuration..." button
+to the left of the Run button in the toolbar. Clicked on its "+" button, named the configuration "Jeopardy" and
+selected ``jeopardy.py`` in the Script Path box.
+
+When I pressed the Run button to test the program it worked!
+
+Setting up Sphinx
+-----------------
+
+I tried to do a ``sphinx-quickstart`` but it refused to let me since I already had a ``conf.py`` file available. All I
+really had to do to prevent warning messages is to add an empty directory to the ``.docs`` folder called ``_static``. It
+didn't warn me about it but, after reading the :ref:`above <installing_sphinx>` I added an empty ``_templates``
+directory too.
+
+
 

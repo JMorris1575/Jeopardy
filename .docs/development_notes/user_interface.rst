@@ -217,4 +217,68 @@ Here is a table of variables and their use:
 Enums
 -----
 
+I have finally figured out how to use Python's Enums. Here is the current form of the ``constants.py`` file so that I
+have listed them somewhere in this documentation::
 
+    from enum import Enum
+
+    class Segment(Enum):
+        Jeopardy = 1
+        DoubleJeopardy = 2
+        FinalJeopardy = 3
+
+    class ProgramState(Enum):
+        Neutral = 1
+        Editing = 2
+        Playing = 3
+
+    class DisplayType(Enum):
+        Category = 1
+        Clue = 2
+
+    class DisplayState(Enum):
+        Blank = 1
+        Waiting = 2
+        Category = 3
+        Explanation = 4
+        Clue = 5
+        Response = 6
+        Dollars = 7
+        Points = 8
+
+The JeopardyStage Class
+=======================
+
+I think there should be a class to manage all of the parts of the board: the array of DisplayUnits, the yet to be
+created Scoreboards, the TimingLights etc. It can inherit QGraphicsScreen and be displayed by a QGraphicsViewer.
+
+What should it be called? I had thought of calling it the Board class but it manages more than just the board. Could I
+call it the Scene class? How about Stage or JeopardyStage or JeopardyScene or Jeopardy<Something>. The one I like best
+so far is "JeopardyStage" because it mimics the stage for the TV show. I will go with that for a while. (And complete
+the heading above.)
+
+But, since I'm not ready to implement the entire class yet I will create just a stub version of the class to have a
+QGraphicsScene to work with then concentrate on the Board class.
+
+I think all I want the JeopardyStage class to do for now is to create a Board class to manage the array of DisplayUnits.
+
+The Board Class
+===============
+
+Initial Thoughts and Questions
+------------------------------
+
+I'm thinking the Board class, when initialized, should create a blank board. It will know the board should be blank
+because the self.program_state variable will be set to ProgramState.Neutral. Somehow, I haven't decided how yet, any
+change in the self.program_state variable should immediately call for a change in the board status. If it changes to
+ProgramState.Editing any empty DisplayUnits should have question marks in them, or perhaps asterisks or a different
+color of question mark if they are only partially completed. If it changes to ProgramState.Playing it should present
+a Jeopardy board ready for playing.
+
+The Board class is in charge of getting a Game class and putting it into the elements of the board.
+
+Who should be in charge of determining whether the game is Playable or not?
+
+I don't know how much else the Board class should be responsible to DO, I'm trying to keep to the MVC model and the
+Controller (jeopardy.py) should do most of the controlling. Perhaps the Board class just needs to set up something
+with the proper controls.

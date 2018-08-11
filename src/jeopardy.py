@@ -11,7 +11,8 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
     def __init__(self, app, parent=None):
         super(Jeopardy, self).__init__(parent)
         self.app = app
-        self.createUI(self)
+        self.screenGeometry = self.getScreenGeometry()
+        self.createUI(self.screenGeometry)
         self.setProgramState(ProgramState.Neutral)
 
         # class variables (is class variables the correct name?)
@@ -27,6 +28,10 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
     #     for item in item_list:
     #         print(item)
 
+    def getScreenGeometry(self):
+        desktop = self.app.desktop()
+        screenNumber = desktop.screenNumber(self)  # gets the screen the form is on
+        return desktop.availableGeometry(screenNumber)  # as a QRect
 
     def file_open(self):
         print("Got to file_open.")
@@ -39,7 +44,7 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
     def file_create(self):
         print("Got to file_create.")
         self.setProgramState(ProgramState.Editing)
-        self.category_displays[3].display_state = DisplayState.Category
+        self.board.category_displays[3].display_state = DisplayState.Category
 
     def file_close(self):
         print("Got to file_close.")
@@ -76,7 +81,9 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
 
     def game_names(self):
         print("Got to game_names.")
-        self.clue_displays[3][3].clue = "Once upon a time"
+        self.board.clue_displays[2][1].display_state = DisplayState.Clue
+        self.board.clue_displays[2][1].clue = "Once upon a time"
+        print()
 
     def game_practice(self):
         print("Got to game_practice.")
@@ -136,10 +143,6 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
                 self.game_correct_action.setEnabled(True)
         else:
             print("Set program state called with unrecognized state.")
-
-
-
-
 
 
 if __name__ == "__main__":

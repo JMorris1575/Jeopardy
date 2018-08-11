@@ -113,3 +113,59 @@ class DisplayUnit(QGraphicsItem):
         return graphics_text_item
 
 
+class Board(QGraphicsItem):
+
+    def __init__(self, screenGeometry, scene, parent=None):
+
+        super(Board, self).__init__(parent)
+
+        # compute the size of the DisplayUnits
+        display_unit_width = screenGeometry.width() * 0.1  # calculates 10% of the available height
+        display_unit_height = display_unit_width * 9/16       # maintain a 16:9 aspect ratio
+        display_unit_size = QSizeF(display_unit_width, display_unit_height)
+
+        self.createBoard(display_unit_size, scene)
+
+    # The following two methods are mandatory when subclassing QGraphicsItem
+
+    def boundingRect(self):
+        return QRectF(0, 0, self.size.width(), self.size.height())
+
+    def paint(self, painter, option, widget):
+        # paints all of the DisplayUnits in their current state
+        for element in self.category_displays:
+            element.paint(painter, option, widget)
+        for column in self.clue_displays:
+            for element in column:
+                element.paint(painter, option, widget)
+
+    def createBoard(self, size, scene):
+        """
+        Creates a blank Jeopardy board for later use
+        :param size: QFSize telling the width and height of the display units for this screen
+        :return: None
+        """
+        # calculate the gap between display units (5% of the width of the unit)
+        gap = size.width()/20
+
+        # Create the category displays
+        self.category_displays = []
+        for col in range(6):
+            element = DisplayUnit(size, type=DisplayType.Category)
+            element.setPos(col * (size.width() + gap), 0)
+            element.display_state = DisplayState.Blank
+            self.category_displays.append(element)
+            scene.addItem(element)
+
+        # Create the clue displays
+        self.clue_displays = []
+        for col in range(6):
+            row_list = []
+            for row in range(5):
+                element = DisplayUnit(size, DisplayType.Clue)
+                element.setPos(col * (size.width() + gap), size.height() + 2 * gap + row * (size.height() + gap))
+                element.display_state = DisplayState.Blank
+                scene.addItem(element)
+                row_list.append(element)
+            self.clue_displays.append(row_list)
+
