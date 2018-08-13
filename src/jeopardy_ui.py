@@ -61,8 +61,19 @@ class JeopardyUI(object):
 
         editMenu = self.menuBar().addMenu("&Edit")
 
-        self.edit_modify_action = editMenu.addAction("&Modify Game")
-        self.edit_modify_action.triggered.connect(self.edit_modify)
+        self.edit_modifyMenu = editMenu.addMenu("&Modify")
+        self.edit_modify_info_action = self.edit_modifyMenu.addAction("&Game Information")
+        self.edit_modify_info_action.setToolTip("Add or edit background information for this game.")
+        self.edit_modify_info_action.triggered.connect(self.edit_modify_info)
+        self.edit_modify_jeopardy_action = self.edit_modifyMenu.addAction("&Jeopardy")
+        self.edit_modify_jeopardy_action.setToolTip("Edit Items for the Jeopardy Segment")
+        self.edit_modify_jeopardy_action.triggered.connect(self.edit_modify_jeopardy)
+        self.edit_modify_double_jeopardy_action = self.edit_modifyMenu.addAction("&Double Jeopardy")
+        self.edit_modify_double_jeopardy_action.setToolTip("Edit Items for the Double Jeopardy Segment")
+        self.edit_modify_double_jeopardy_action.triggered.connect(self.edit_modify_double_jeopardy)
+        self.edit_modify_final_jeopardy_action = self.edit_modifyMenu.addAction("&Final Jeopardy")
+        self.edit_modify_final_jeopardy_action.setToolTip("Edit Items for the Final Jeopardy Segment")
+        self.edit_modify_final_jeopardy_action.triggered.connect(self.edit_modify_final_jeopardy)
 
         editMenu.addSeparator()
 
@@ -88,11 +99,21 @@ class JeopardyUI(object):
         self.game_practice_action = gameMenu.addAction("&Practice")
         self.game_practice_action.triggered.connect(self.game_practice)
 
-        self.game_play_action = gameMenu.addAction("Play &Jeopardy!")
-        self.game_play_action.triggered.connect(self.game_play)
+        self.game_playMenu = gameMenu.addMenu("&Play")
+        self.game_play_jeopardy_action = self.game_playMenu.addAction("&Jeopardy")
+        self.game_play_jeopardy_action.triggered.connect(self.game_play_jeopardy)
+        self.game_play_double_jeopardy_action = self.game_playMenu.addAction("&Double Jeopardy")
+        self.game_play_double_jeopardy_action.triggered.connect(self.game_play_double_jeopardy)
+        self.game_play_final_jeopardy_action = self.game_playMenu.addAction("&Final Jeopardy")
+        self.game_play_final_jeopardy_action.triggered.connect(self.game_play_final_jeopardy)
 
         self.game_correct_action = gameMenu.addAction("&Correct Scoring Errors")
         self.game_correct_action.triggered.connect(self.game_correct)
+
+        gameMenu.addSeparator()
+
+        self.game_settings_action = gameMenu.addAction("Settings...")
+        self.game_settings_action.triggered.connect(self.game_settings)
 
         # helpMenu
 

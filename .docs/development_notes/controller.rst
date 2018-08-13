@@ -6,12 +6,15 @@ My notes here are likely to be a little haphazard since I will be building some 
 controller, the parts I know how to do, as I develop the user interface and save other parts for when my practicing
 with the program suggests that I need something.
 
+Keeping Track of the Program Mode
+---------------------------------
+
 As it stands now, I have completed at least the first draft of the main window's menu bar and the next thing on my mind
 is to set up a system to disable/enable different menu entries according to the different states the program will be in.
 Here is my idea of the different modes:
 
 A. Program just loaded, no game open - neutral mode
-#. Game open for creation or editing - edit mode
+#. Game open for creation or editing - neutral mode
 #. Game being played - playing mode
 
 Here is a table showing which menu items are to be enabled in each mode:
@@ -33,7 +36,7 @@ Here is a table showing which menu items are to be enabled in each mode:
 +---------------------+---------+---------+---------+
 | file-exit           | X       | X       | X       |
 +---------------------+---------+---------+---------+
-| edit-modify         |         | X       | X       |
+| edit-modifyMenu     | X**     | X       | X       |
 +---------------------+---------+---------+---------+
 | edit-cut            |         | X       |         |
 +---------------------+---------+---------+---------+
@@ -45,7 +48,7 @@ Here is a table showing which menu items are to be enabled in each mode:
 +---------------------+---------+---------+---------+
 | game-practice       | X       | X       | X       |
 +---------------------+---------+---------+---------+
-| game-play           | X       | X*      | X*      |
+| game-playMenu       | X       | X*      | X*      |
 +---------------------+---------+---------+---------+
 | game-correct_scores |         | X*      | X*      |
 +---------------------+---------+---------+---------+
@@ -58,16 +61,18 @@ Here is a table showing which menu items are to be enabled in each mode:
 
 * These menu items are only available if the game loaded is marked as playable.
 
+** This is only available if a game is loaded
+
 But a question has been raised in my mind. How is the program to know, when the user loads a game, whether the user
 wants to edit the game or play the game? One possibility is to presume editing is desired until the user clicks the
 "Play Jeopardy!" entry. I could use the edit-modify menu entry to allow for editing during a played game. It would have
 to check to see if a game was in progress and suspend it, somehow stopping its timers, as well as activating the items
 in edit mode, until the user clicks game-play again (now labelled something like "Return to the Game").
 
-That all suggests a new method in the Jeopardy class: setProgramState(state=neutral, editing or playing) and a new enum
+That all suggests a new method in the Jeopardy class: setProgramMode(state=neutral, editing or playing) and a new enum
 to go with it::
 
-    class ProgramState(Enum):
+    class ProgramMode(Enum):
         Neutral = 1
         Editing = 2
         Playing = 3
@@ -75,6 +80,26 @@ to go with it::
 Since a couple of the menu entries should only be enabled if a playable game is present I rigged up the ``file_open``
 method to read in my ``temp_saved_game`` in the ``src`` directory in order to test whether that happens or not.
 
+Creating self.game_pathname
+---------------------------
+
 That did work but while working on it another thought came to my mind about the ``file_open`` method. It will somehow
 (either from a file dialog box or from a custom made game selection box of my own) be given a pathname to open. I
 suspect it will be good to save that pathname for later saving. I created a ``self.game_pathname`` just in case.
+
+Playing the Game(s)
+-------------------
+
+The leader will have to be able to select which game to play: Jeopardy, Double Jeopardy or Final Jeopardy during the
+game. That suggests that, under the Game menu there should be a "Play" entry with sub-menus for each of the three
+options. Now... how do I do sub-menus?
+
+According to the documentation at http://doc.qt.io/qt-5/qmenu.html#details I should be able to use Menu.addMenu() to add
+a sub-menu. Let me try that...
+
+That worked quite well and, in the process of implementing it I realized I would have to do the same thing for editing.
+A game can only be edited or played, of course, if it has been loaded in memory so both the ``file_open`` and
+``file_create`` methods will have to set a ``self.game_loaded`` variable to ``True``. It will start out ``False``
+and return to false in the ``file_close`` method. (It seems that ``file_close`` should also set the program back to
+``ProgramMode.Neutral``. I will implement all of that now.
+

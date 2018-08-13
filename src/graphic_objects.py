@@ -17,12 +17,14 @@ class DisplayUnit(QGraphicsItem):
         self.amount = amount
         self.clue = clue
         self.correct_response = correct_response
+        self.segment = segment
 
         self.display_state = DisplayState.Blank
+        self.hide_category = False
 
         self.category_font = QFont("Arial", 18)
         self.clue_font = QFont("Arial", 18)
-        self.number_font = QFont("Arial", 40, QFont.Bold)
+        self.number_font = QFont("Arial", 32, QFont.Bold)
 
         self._shadow_text = QGraphicsTextItem(self)
         self._shadow_text.setDefaultTextColor(QColor(Qt.black))
@@ -36,6 +38,8 @@ class DisplayUnit(QGraphicsItem):
 
     def paint(self, painter, option, widget):
         target = QRectF(self.boundingRect())
+        if self.hide_category:
+            if self.
         pixmap = QPixmap('../images/blue_screen.png')
         source = QRectF(pixmap.rect())
         painter.drawPixmap(target, pixmap, source)
@@ -86,7 +90,6 @@ class DisplayUnit(QGraphicsItem):
         self._foreground_text.setPlainText(text)
         self._foreground_text = self.centerText(self._foreground_text, font)                # foreground is not offset
 
-
     def centerText(self, graphics_text_item, font):
 
         # Center alignment code adapted from http://www.cesarbs.org/blog/2011/05/30/aligning-text-in-qgraphicstextitem/
@@ -119,6 +122,8 @@ class Board(QGraphicsItem):
 
         super(Board, self).__init__(parent)
 
+        self.base_amount = 200                  # the smallest number of dollars or points
+                                                # by using this variable you can opt to change it later
         # compute the size of the DisplayUnits
         display_unit_width = screenGeometry.width() * 0.1  # calculates 10% of the available height
         display_unit_height = display_unit_width * 9/16       # maintain a 16:9 aspect ratio
@@ -169,3 +174,35 @@ class Board(QGraphicsItem):
                 row_list.append(element)
             self.clue_displays.append(row_list)
 
+    def fillBoard(self, game, segment):
+        """
+        Fills all of the Category and Clue units
+        :param game: an instance of the Game class
+        :param segment: a member of the Segment class: Segment.Jeopardy, Segment.DoubleJeopardy or Segment.FinalJeopardy
+        :return: None
+        """
+        if segment == Segment.Jeopardy or segment == Segment.DoubleJeopardy:
+            categories = game.get_categories(segment)
+            col = 0
+            for category in categories:
+                self.category_displays[col].category_text = category.title
+                self.category_displays[col].category_explanation = category.explanation
+                # the following line is temporary. Later it should display a "Jeopardy" or "Double Jeopardy" card
+                #  covering the category unless the game is being edited then the category name should show
+                # this means the games should be opened in ProgramMode.Neutral and it calls for another
+                # DisplayState
+                self.category_displays[col].display_state = DisplayState.Category
+                row = 0
+                for item in category.items:
+                    if segment == Segment.Jeopardy:
+                        self.clue_displays[col][row].amount = self.base_amount + self.base_amount * row
+                    elif segment == Segment.DoubleJeopardy:
+                        self.clue_displays[col][row].amount = 2 * self.base_amount + 2 * self.base_amount * row
+                    self.clue_displays[col][row].clue = item.clue
+                    self.clue_displays[col][row].correct_response = item.response
+                    self.clue_displays[col][row].display_state = DisplayState.Dollars
+                    row += 1
+                col += 1
+        else:
+            # fill the board for game.final_jeopardy[]
+            pass

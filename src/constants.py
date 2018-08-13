@@ -5,7 +5,7 @@ class Segment(Enum):
     DoubleJeopardy = 2
     FinalJeopardy = 3
 
-class ProgramState(Enum):
+class ProgramMode(Enum):
     Neutral = 1
     Editing = 2
     Playing = 3
@@ -23,6 +23,7 @@ class DisplayState(Enum):
     Response = 6
     Dollars = 7
     Points = 8
+    Emblem = 9
 
 
 

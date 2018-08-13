@@ -227,7 +227,7 @@ have listed them somewhere in this documentation::
         DoubleJeopardy = 2
         FinalJeopardy = 3
 
-    class ProgramState(Enum):
+    class ProgramMode(Enum):
         Neutral = 1
         Editing = 2
         Playing = 3
@@ -269,10 +269,10 @@ Initial Thoughts and Questions
 ------------------------------
 
 I'm thinking the Board class, when initialized, should create a blank board. It will know the board should be blank
-because the self.program_state variable will be set to ProgramState.Neutral. Somehow, I haven't decided how yet, any
+because the self.program_state variable will be set to ProgramMode.Neutral. Somehow, I haven't decided how yet, any
 change in the self.program_state variable should immediately call for a change in the board status. If it changes to
-ProgramState.Editing any empty DisplayUnits should have question marks in them, or perhaps asterisks or a different
-color of question mark if they are only partially completed. If it changes to ProgramState.Playing it should present
+ProgramMode.Editing any empty DisplayUnits should have question marks in them, or perhaps asterisks or a different
+color of question mark if they are only partially completed. If it changes to ProgramMode.Playing it should present
 a Jeopardy board ready for playing.
 
 The Board class is in charge of getting a Game class and putting it into the elements of the board.
@@ -282,3 +282,18 @@ Who should be in charge of determining whether the game is Playable or not?
 I don't know how much else the Board class should be responsible to DO, I'm trying to keep to the MVC model and the
 Controller (jeopardy.py) should do most of the controlling. Perhaps the Board class just needs to set up something
 with the proper controls.
+
+When a board is initially displayed, the category names should be "covered" by "cards" indicating th segment currently
+being played. I think this can be easily done in the DisplayUnit's ``paint()`` routine. The DisplayUnit could have a
+variable called ``self.hide_category`` which would be ``True`` if the category name is to be covered, ``False``
+otherwise. This should apply only when ``self.display_state`` is set to ``Display.Category`` and the ``paint()``
+routine could check to see which image to display by checking ``self.segment``. ``self.hide_category`` could be set by
+the ``self.file_open()`` method and changed when the program mode changes to ``ProgramMode.Editing`` or during the
+sequence of events that takes place when the leader is revealing the categories. (I'll have to think about how the
+leader will do that.)
+
+As I started to implement that, however, I noticed that the DisplayUnits do not know which segment a game is in. That
+is something the ``Jeopardy()`` class knows. I'm not sure what would be the best way to get that information to the
+DisplayUnits that need it. Perhaps a ``setSegment()`` method to be called on the category displays any time the game
+segment changes. That doesn't seem ideal but I'm going to bed!
+
