@@ -17,10 +17,10 @@ class DisplayUnit(QGraphicsItem):
         self.amount = amount
         self.clue = clue
         self.correct_response = correct_response
-        self.segment = segment
 
         self.display_state = DisplayState.Blank
         self.hide_category = False
+        self.category_cover = QPixmap('../images/jeopardy.png')
 
         self.category_font = QFont("Arial", 18)
         self.clue_font = QFont("Arial", 18)
@@ -39,11 +39,14 @@ class DisplayUnit(QGraphicsItem):
     def paint(self, painter, option, widget):
         target = QRectF(self.boundingRect())
         if self.hide_category:
-            if self.
-        pixmap = QPixmap('../images/blue_screen.png')
-        source = QRectF(pixmap.rect())
-        painter.drawPixmap(target, pixmap, source)
-        self.displayText()
+            pixmap = self.category_cover
+            source = QRectF(pixmap.rect())
+            painter.drawPixmap(target, pixmap, source)
+        else:
+            pixmap = QPixmap('../images/blue_screen.png')
+            source = QRectF(pixmap.rect())
+            painter.drawPixmap(target, pixmap, source)
+            self.displayText()
 
     # Here is where my own methods start
 
@@ -138,9 +141,12 @@ class Board(QGraphicsItem):
 
     def paint(self, painter, option, widget):
         # paints all of the DisplayUnits in their current state
+        print("In Board.paint()")
         for element in self.category_displays:
+            print("Painting a category display")
             element.paint(painter, option, widget)
         for column in self.clue_displays:
+            print("Painting a clue display")
             for element in column:
                 element.paint(painter, option, widget)
 
@@ -206,3 +212,34 @@ class Board(QGraphicsItem):
         else:
             # fill the board for game.final_jeopardy[]
             pass
+
+    def setCategoriesHidden(self, segment):
+        """
+        Covers the category names with a graphic depending on the segment, Jeopardy, Double Jeopardy or Final Jeopardy.
+        :param: segment - ProgramSegment.Jeopardy, ProgramSegment.DoubleJeopardy or ProgramSegment.FinalJeopardy
+        :return: None
+        """
+        for category_display in self.category_displays:
+            category_display.hide_category = True
+            if segment == Segment.Jeopardy:
+                category_display.category_cover = QPixmap('../images/JeopardyCard.png')
+            elif segment == Segment.DoubleJeopardy:
+                category_display.category_cover = QPixmap('../images/JeopardyCard.png')
+            else:
+                category_display.category_cover = QPixmap('../images/JeopardyCard.png')
+
+    def revealCategories(self):
+        """
+        Reveals the categories (if hidden) by changing DisplayUnit.hide_category to False on all of the category units
+        :return:
+        """
+        for category_display in self.category_displays:
+            category_display.hide_category = False
+
+    def revealCategory(self, number):
+        """
+        Reveals the category represented by number
+        :param number: an integer 0 through 5
+        :return: None
+        """
+        self.category_displays[number].hide_category = False

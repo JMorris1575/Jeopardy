@@ -297,3 +297,8 @@ is something the ``Jeopardy()`` class knows. I'm not sure what would be the best
 DisplayUnits that need it. Perhaps a ``setSegment()`` method to be called on the category displays any time the game
 segment changes. That doesn't seem ideal but I'm going to bed!
 
+...
+
+In bed I thought that relegating the decision of whether to display the categories or not to the Board class. It IS the
+Board Class' duty to manage the DisplayUnits after all. the ``fillBoard()`` method does know the segment
+

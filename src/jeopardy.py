@@ -20,7 +20,7 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
         self.game_pathname = ""
         self.game_modified = False
 
-        self.setProgramMode(ProgramMode.Neutral)
+        self.setProgramMode(ProgramMode.Empty)
         self.game_segment = Segment.Jeopardy
 
     def getScreenGeometry(self):
@@ -38,6 +38,7 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
         print("The game is marked playable = ", self.game.playable)
         self.game_loaded = True
         self.setProgramMode(ProgramMode.Neutral)
+        self.board.setCategoriesHidden(self.game_segment)
         self.board.fillBoard(self.game, Segment.Jeopardy)
 
     def file_create(self):
@@ -78,6 +79,7 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
         print("Got to edit_modify_jeopardy.")
         self.setProgramMode(ProgramMode.Editing)
         self.setSegment(Segment.Jeopardy)
+        self.board.revealCategories()
 
     def edit_modify_double_jeopardy(self):
         print("Got to edit_modify_double_jeopardy.")
@@ -140,9 +142,9 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
     def help_about(self):
         print("Got to help_about.")
 
-    def setProgramMode(self, state):
-        self.programState = state
-        if state == ProgramMode.Neutral:
+    def setProgramMode(self, mode):
+        self.program_mode = mode
+        if mode == ProgramMode.Neutral:
             self.file_close_action.setEnabled(False)
             self.file_save_action.setEnabled(False)
             self.file_save_as_action.setEnabled(False)
@@ -156,7 +158,7 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
             self.edit_paste_action.setEnabled(False)
             self.game_playMenu.setEnabled(False)
             self.game_correct_action.setEnabled(False)
-        elif state == ProgramMode.Editing:
+        elif mode == ProgramMode.Editing:
             self.file_close_action.setEnabled(True)
             self.file_save_action.setEnabled(True)
             self.file_save_as_action.setEnabled(True)
@@ -171,7 +173,7 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
             else:
                 self.game_playMenu.setEnabled(False)
                 self.game_correct_action.setEnabled(False)
-        elif state == ProgramMode.Playing:
+        elif mode == ProgramMode.Playing:
             self.file_close_action.setEnabled(True)
             self.file_save_action.setEnabled(False)
             self.file_save_as_action.setEnabled(False)
@@ -188,6 +190,9 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
                 self.game_correct_action.setEnabled(False)
         else:
             print("setProgramMode called with unrecognized mode.")
+
+    def getProgramMode(self):
+        return self.program_mode
 
     def setSegment(self, segment):
         """

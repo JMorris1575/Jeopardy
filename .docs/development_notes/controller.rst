@@ -11,53 +11,60 @@ Keeping Track of the Program Mode
 
 As it stands now, I have completed at least the first draft of the main window's menu bar and the next thing on my mind
 is to set up a system to disable/enable different menu entries according to the different states the program will be in.
-Here is my idea of the different modes:
+Here is my original idea of the different modes:
 
 A. Program just loaded, no game open - neutral mode
 #. Game open for creation or editing - neutral mode
 #. Game being played - playing mode
 
+After working on the program for a while I decided on a different set of modes:
+
+A. No game loaded - Empty mode
+#. Game loaded but neither editing nor playing - Neutral mode
+#. Game loaded and being edited - Editing mode
+#. Game loaded and being played - Playing mode
+
 Here is a table showing which menu items are to be enabled in each mode:
 
-+---------------------+---------+---------+---------+
-| Menu Item           | Neutral |   Edit  | Playing |
-+=====================+=========+=========+=========+
-| file-open           | X       | X       | X       |
-+---------------------+---------+---------+---------+
-| file-create         | X       | X       | X       |
-+---------------------+---------+---------+---------+
-| file-close          |         | X       | X       |
-+---------------------+---------+---------+---------+
-| file-save           |         | X       |         |
-+---------------------+---------+---------+---------+
-| file-save_as        |         | X       |         |
-+---------------------+---------+---------+---------+
-| file-print          |         | X       | X       |
-+---------------------+---------+---------+---------+
-| file-exit           | X       | X       | X       |
-+---------------------+---------+---------+---------+
-| edit-modifyMenu     | X**     | X       | X       |
-+---------------------+---------+---------+---------+
-| edit-cut            |         | X       |         |
-+---------------------+---------+---------+---------+
-| edit-copy           |         | X       |         |
-+---------------------+---------+---------+---------+
-| edit-paste          |         | X       |         |
-+---------------------+---------+---------+---------+
-| game-names          | X       | X       | X       |
-+---------------------+---------+---------+---------+
-| game-practice       | X       | X       | X       |
-+---------------------+---------+---------+---------+
-| game-playMenu       | X       | X*      | X*      |
-+---------------------+---------+---------+---------+
-| game-correct_scores |         | X*      | X*      |
-+---------------------+---------+---------+---------+
-| help-using_program  | X       | X       | X       |
-+---------------------+---------+---------+---------+
-| help-rules          | X       | X       | X       |
-+---------------------+---------+---------+---------+
-| help-about          | X       | X       | X       |
-+---------------------+---------+---------+---------+
++---------------------+---------+---------+---------+---------+
+| Menu Item           | Empty   | Neutral | Editing | Playing |
++=====================+=========+=========+=========+=========+
+| file-open           | X       | X       | X       |         |
++---------------------+---------+---------+---------+---------+
+| file-create         | X       | X       | X       |         |
++---------------------+---------+---------+---------+---------+
+| file-close          |         | X       | X       |         |
++---------------------+---------+---------+---------+---------+
+| file-save           |         | X       | X       |         |
++---------------------+---------+---------+---------+---------+
+| file-save_as        |         | X       | X       |         |
++---------------------+---------+---------+---------+---------+
+| file-print          |         | X       | X       |         |
++---------------------+---------+---------+---------+---------+
+| file-exit           | X       | X       | X       | X       |
++---------------------+---------+---------+---------+---------+
+| edit-modifyMenu     |         | X       | X       |         |
++---------------------+---------+---------+---------+---------+
+| edit-cut            |         |         | X       |         |
++---------------------+---------+---------+---------+---------+
+| edit-copy           |         |         | X       |         |
++---------------------+---------+---------+---------+---------+
+| edit-paste          |         |         | X       |         |
++---------------------+---------+---------+---------+---------+
+| game-names          | X       | X       |         | X       |
++---------------------+---------+---------+---------+---------+
+| game-practice       | X       | X       |         | X       |
++---------------------+---------+---------+---------+---------+
+| game-playMenu       | X       | X*      |         | X       |
++---------------------+---------+---------+---------+---------+
+| game-correct_scores |         |         |         | X       |
++---------------------+---------+---------+---------+---------+
+| help-using_program  | X       | X       | X       | X       |
++---------------------+---------+---------+---------+---------+
+| help-rules          | X       | X       | X       | X       |
++---------------------+---------+---------+---------+---------+
+| help-about          | X       | X       | X       | X       |
++---------------------+---------+---------+---------+---------+
 
 * These menu items are only available if the game loaded is marked as playable.
 
@@ -68,6 +75,8 @@ wants to edit the game or play the game? One possibility is to presume editing i
 "Play Jeopardy!" entry. I could use the edit-modify menu entry to allow for editing during a played game. It would have
 to check to see if a game was in progress and suspend it, somehow stopping its timers, as well as activating the items
 in edit mode, until the user clicks game-play again (now labelled something like "Return to the Game").
+
+After working on the program for a while I decided that it might be better to have
 
 That all suggests a new method in the Jeopardy class: setProgramMode(state=neutral, editing or playing) and a new enum
 to go with it::

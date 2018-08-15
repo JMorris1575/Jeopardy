@@ -6,9 +6,10 @@ class Segment(Enum):
     FinalJeopardy = 3
 
 class ProgramMode(Enum):
-    Neutral = 1
-    Editing = 2
-    Playing = 3
+    Empty = 1
+    Neutral = 2
+    Editing = 3
+    Playing = 4
 
 class DisplayType(Enum):
     Category = 1
