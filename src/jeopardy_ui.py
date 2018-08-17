@@ -1,7 +1,3 @@
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
-
 from graphic_objects import *
 from models import *
 
@@ -149,9 +145,7 @@ class JeopardyUI(object):
         self.view.setViewportUpdateMode(QGraphicsView.BoundingRectViewportUpdate) #todo: find out what this does
 
         self.view.setScene(self.stage_set)
-        print("self.view.viewportUpdateMode() before = ", self.view.viewportUpdateMode())
         self.view.setViewportUpdateMode(QGraphicsView.FullViewportUpdate)
-        print("self.view.viewportUpdateMode() after = ", self.view.viewportUpdateMode())
 
         self.setCentralWidget(self.view)
 
