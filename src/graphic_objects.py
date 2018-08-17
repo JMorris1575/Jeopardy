@@ -21,14 +21,10 @@ class DisplayUnit(QGraphicsItem):
         self._text_item = QGraphicsTextItem(self.text, self)
         self._text_item.setDefaultTextColor(QColor(self.color))
 
+        #:todo: figure out how to handle the following three things in this new approach
         # self.display_state = DisplayState.Blank
         # self.hide_category = False
         # self.category_cover = QPixmap('../images/jeopardy.png')
-        #
-        # self._shadow_text = QGraphicsTextItem(self)
-        # self._shadow_text.setDefaultTextColor(QColor(Qt.black))
-        #
-        # self._foreground_text = QGraphicsTextItem(self)     # the color will be set later in self.displayText()
 
     # The following two methods are mandatory when subclassing QGraphicsItem
 
