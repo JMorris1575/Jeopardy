@@ -139,5 +139,68 @@ I'm going to try this:
 
 #. Give the DisplayUnits a reference to the controller so they can tell the controller the events of their lives.
 
+Editing Jeopardy Games - A Narrative Run-Through
+================================================
 
+Jim has finally finished the part of the Jeopardy program that allows for creating and editing games. He fires up the
+program and clicks on File->Create... and a dialog appears with a form for filling out the game information:
 
+#. Name
+
+#. Topic
+
+#. Target Group
+
+#. Default Settings:
+
+    A. Time allowed for players to respond
+
+    #. Scoring Method (Dollars or Points)
+
+    #. Base Amount (Lowest value square (all others based on it)
+
+Having a name is mandatory as it will be transformed into a filename, and the resulting filename must be unique for the
+set of game files on the local system. (If I have time I can make "catalogs" of games, subfolders within the main
+program's game folder.)
+
+The rest of the items are optional but helpful for the listing of games that will be given when File->Open... is
+clicked.
+
+The default Default Settings I have in mind right now are 5 seconds for the time allowed for players to respond and
+Dollars for the scorekeeping method. (That one doesn't really matter since we're NOT giving away money!) The default
+Base Amount will be 200.
+
+Once he fills that out the board shifts into edit mode as indicated by the dark grey, rather than black, background. The
+board is ready for Jeopardy categories and clues as indicated by an image of the Jeopardy cover card to the left of the
+main board. Jim enters categories and clues into the game in one of the following two ways:
+
+|
+
++--------------------------------------------------------------------------------------------------------------------+
+| **The Easy Way**                                                                                                   |
++====================================================================================================================+
+| When Jim clicks on a category square a dialog opens where he can enter the category and an optional explanation    |
+| for that category. When Jim clicks on a clue square a dialog opens which allows him to enter the clue and its      |
+| correct response. In either case, as text is entered into the edit boxes it also appears on a "screen" as it would |
+| appear during the game.                                                                                            |
++--------------------------------------------------------------------------------------------------------------------+
+
+|
+
++--------------------------------------------------------------------------------------------------------------------+
+| **The Dream Way**                                                                                                  |
++====================================================================================================================+
+| When Jim clicks on a category square that square enters into edit mode and Jim types the category name into the    |
+| square. If he wants to enter an explanation for that category he can double-click the square. When Jim clicks on a |
+| clue square it allows him to enter the clue and the correct response in the same way.                              |
++--------------------------------------------------------------------------------------------------------------------+
+
+|
+
+Jim can correct his entries simply by clicking on a box again and either the filled-out dialog for that box, or the box
+itself will appear according to whether I do it the easy way or can figure out how to do it the dream way.
+
+Jim can click on Edit->Modify to enter or edit categories and clues for Double Jeopardy and Final Jeopardy.
+
+After each entry the game is checked for completeness. If it is complete it is marked as playable and will appear in
+the File->Open... dialog box
