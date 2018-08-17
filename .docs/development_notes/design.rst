@@ -253,3 +253,15 @@ have plans anyway.
 
 This requires more thought. Am I keeping to the MVC model? It seems the View and the Controller are being built
 together. Is that what I want?
+
+Creating and Editing .jqz files
+===============================
+
+I have more or less completed the steps above up through 3. A. Now it's time to study creating and editing the .jqz
+files that will hold the games. Here is a tentative plan:
+
+#. Work on the self.file_create routine to:
+    A. Check to see if a file currently in memory has been changed and may need saving.
+    #. Once saved, if the user wishes to do so, erase that game.
+    #. Leave the program in ProgramMode.Editing mode with the board set to Segment.Jeopardy and ready to edit game info.
+

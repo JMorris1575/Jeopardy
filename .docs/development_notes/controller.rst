@@ -29,46 +29,52 @@ Here is a table showing which menu items are to be enabled in each mode:
 +---------------------+---------+---------+---------+---------+
 | Menu Item           | Empty   | Neutral | Editing | Playing |
 +=====================+=========+=========+=========+=========+
-| file-open           | X       | X       | X       |         |
+| file_open           | X       | X       | X       |         |
 +---------------------+---------+---------+---------+---------+
-| file-create         | X       | X       | X       |         |
+| file_create         | X       | X       | X       |         |
 +---------------------+---------+---------+---------+---------+
-| file-close          |         | X       | X       |         |
+| file_close          |         | X       | X       |         |
 +---------------------+---------+---------+---------+---------+
-| file-save           |         | X       | X       |         |
+| file_save           |         | X       | X       |         |
 +---------------------+---------+---------+---------+---------+
-| file-save_as        |         | X       | X       |         |
+| file_save_as        |         | X       | X       |         |
 +---------------------+---------+---------+---------+---------+
-| file-print          |         | X       | X       |         |
+| file_print          |         | X       | X       |         |
 +---------------------+---------+---------+---------+---------+
-| file-exit           | X       | X       | X       | X       |
+| file_exit           | X       | X       | X       | X       |
 +---------------------+---------+---------+---------+---------+
-| edit-modifyMenu     |         | X       | X       |         |
+| edit_modifyMenu     |         | X       | X       |         |
 +---------------------+---------+---------+---------+---------+
-| edit-cut            |         |         | X       |         |
+| edit_cut            |         |         | X       |         |
 +---------------------+---------+---------+---------+---------+
-| edit-copy           |         |         | X       |         |
+| edit_copy           |         |         | X       |         |
 +---------------------+---------+---------+---------+---------+
-| edit-paste          |         |         | X       |         |
+| edit_paste          |         |         | X*      |         |
 +---------------------+---------+---------+---------+---------+
-| game-names          | X       | X       |         | X       |
+| game_names          | X       | X       |         | X       |
 +---------------------+---------+---------+---------+---------+
-| game-practice       | X       | X       |         | X       |
+| game_practice       | X       | X       |         | X       |
 +---------------------+---------+---------+---------+---------+
-| game-playMenu       | X       | X*      |         | X       |
+| game_playMenu       | X       | X*      |         | X       |
 +---------------------+---------+---------+---------+---------+
-| game-correct_scores |         |         |         | X       |
+| game_correct_scores |         |         |         | X       |
 +---------------------+---------+---------+---------+---------+
-| help-using_program  | X       | X       | X       | X       |
+| game_end            |         |         |         | X       |
 +---------------------+---------+---------+---------+---------+
-| help-rules          | X       | X       | X       | X       |
+| game_settings       | X^      | X^      | X^      | X^      |
 +---------------------+---------+---------+---------+---------+
-| help-about          | X       | X       | X       | X       |
+| help_using_program  | X       | X       | X       | X       |
++---------------------+---------+---------+---------+---------+
+| help_rules          | X       | X       | X       | X       |
++---------------------+---------+---------+---------+---------+
+| help_about          | X       | X       | X       | X       |
 +---------------------+---------+---------+---------+---------+
 
-* These menu items are only available if the game loaded is marked as playable.
+* only available if the game loaded is marked as playable.
 
-** This is only available if a game is loaded
+** should only be available in ProgramMode.Editing when there is text on the clipboard.
+
+^ whether this is available in all modes depends on if I decide it is set for the program or for the game
 
 But a question has been raised in my mind. How is the program to know, when the user loads a game, whether the user
 wants to edit the game or play the game? One possibility is to presume editing is desired until the user clicks the
@@ -111,4 +117,27 @@ A game can only be edited or played, of course, if it has been loaded in memory 
 ``file_create`` methods will have to set a ``self.game_loaded`` variable to ``True``. It will start out ``False``
 and return to false in the ``file_close`` method. (It seems that ``file_close`` should also set the program back to
 ``ProgramMode.Neutral``. I will implement all of that now.
+
+(Continue this later)
+
+A Massive Refactor
+==================
+
+I was floundering around trying to figure out how mousePressEvents from the DisplayUnits could get back up to the
+Board. But I found I have been drifting away from the MVC model. Currently the DisplayUnits effectively have to know
+whether they are category units or clue units. That would seem to be the job of the controller. Meanwhile, the Board
+class is a QGraphicsItem but it is never added to the scene and I'm not sure what purpose it is supposed to serve. It
+seems to be another controller.
+
+I'm going to try this:
+
+#. Create a StageSet class that inherits from QGraphicsScene to contain all of the elements of the game
+
+#. Call the QGraphicsScene stageSet. It will contain the board, scoreboards, lights, timers, etc.
+
+#. Make the DisplayUnits dumber. Let the controller set their fonts, text, positions, types and what they display.
+
+#. Give the DisplayUnits a reference to the controller so they can tell the controller the events of their lives.
+
+
 

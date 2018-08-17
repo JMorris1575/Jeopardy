@@ -4,6 +4,14 @@ from PyQt5.QtWidgets import *
 
 from graphic_objects import *
 
+class Stage(QGraphicsView):
+
+    def __init__(self, parent=None):
+        super(Stage, self).__init__(parent)
+
+    def mouseReleaseEvent(self, event):
+        print("Got to mousePressEvent in Stage class.")
+
 class JeopardyUI(object):
 
     # def getElementSize(self):
@@ -14,7 +22,7 @@ class JeopardyUI(object):
     #     element_height = element_width * 9/16       # maintain a 16:9 aspect ratio
     #     return QSizeF(element_width, element_height)
 
-    def createUI(self, screenGeometry):
+    def createUI(self):
 
         ##########################################
         #                                        #
@@ -99,6 +107,8 @@ class JeopardyUI(object):
         self.game_practice_action = gameMenu.addAction("&Practice")
         self.game_practice_action.triggered.connect(self.game_practice)
 
+        gameMenu.addSeparator()
+
         self.game_playMenu = gameMenu.addMenu("&Play")
         self.game_play_jeopardy_action = self.game_playMenu.addAction("&Jeopardy")
         self.game_play_jeopardy_action.triggered.connect(self.game_play_jeopardy)
@@ -109,6 +119,9 @@ class JeopardyUI(object):
 
         self.game_correct_action = gameMenu.addAction("&Correct Scoring Errors")
         self.game_correct_action.triggered.connect(self.game_correct)
+
+        self.game_end_action = gameMenu.addAction("&End this Game")
+        self.game_end_action.triggered.connect(self.game_end)
 
         gameMenu.addSeparator()
 
@@ -132,9 +145,9 @@ class JeopardyUI(object):
 
         # Central Widget
 
-        self.scene = QGraphicsScene()
-        self.scene.setBackgroundBrush(Qt.black)
-        self.board = Board(screenGeometry, self.scene)
+        self.stage_set = QGraphicsScene()
+        self.stage_set.setBackgroundBrush(Qt.black)
+        # self.board = Board(screenGeometry, self.scene)
 
 
         # desktop = self.app.desktop()
@@ -164,12 +177,15 @@ class JeopardyUI(object):
         #         row_list.append(element)
         #     self.clue_displays.append(row_list)
 
+
+
+        # self.view = Stage()
         self.view = QGraphicsView()
         self.view.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.view.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.view.setViewportUpdateMode(QGraphicsView.BoundingRectViewportUpdate) #todo: find out what this does
 
-        self.view.setScene(self.scene)
+        self.view.setScene(self.stage_set)
         print("self.view.viewportUpdateMode() before = ", self.view.viewportUpdateMode())
         self.view.setViewportUpdateMode(QGraphicsView.FullViewportUpdate)
         print("self.view.viewportUpdateMode() after = ", self.view.viewportUpdateMode())

@@ -5,14 +5,16 @@ from PyQt5.QtWidgets import *
 from constants import *
 import jeopardy_ui
 from models import *
+from graphic_objects import *
 
 class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
 
     def __init__(self, app, parent=None):
         super(Jeopardy, self).__init__(parent)
         self.app = app
-        self.screenGeometry = self.getScreenGeometry()
-        self.createUI(self.screenGeometry)
+        self.screen_geometry = self.getScreenGeometry()
+        self.createUI()
+        self.createBoard(self.screen_geometry, self.stage_set)
         self.game_loaded = False
 
         # class variables (is class variables the correct name?)
@@ -22,6 +24,9 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
 
         self.setProgramMode(ProgramMode.Empty)
         self.game_segment = Segment.Jeopardy
+
+        self.base_amount = 200                  # the smallest number of dollars or points
+                                                # by using this variable you can opt to change it later
 
     def getScreenGeometry(self):
         desktop = self.app.desktop()
@@ -38,8 +43,8 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
         print("The game is marked playable = ", self.game.playable)
         self.game_loaded = True
         self.setProgramMode(ProgramMode.Neutral)
-        self.board.setCategoriesHidden(self.game_segment)
-        self.board.fillBoard(self.game, Segment.Jeopardy)
+        self.hideCategories(self.game_segment)
+        self.fillBoard(self.game, Segment.Jeopardy)
 
     def file_create(self):
         print("Got to file_create.")
@@ -79,17 +84,19 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
         print("Got to edit_modify_jeopardy.")
         self.setProgramMode(ProgramMode.Editing)
         self.setSegment(Segment.Jeopardy)
-        self.board.revealCategories()
+        self.revealCategories()
 
     def edit_modify_double_jeopardy(self):
         print("Got to edit_modify_double_jeopardy.")
         self.setProgramMode(ProgramMode.Editing)
         self.setSegment(Segment.DoubleJeopardy)
+        self.revealCategories()
 
     def edit_modify_final_jeopardy(self):
         print("Got to edit_modify_final_jeopardy.")
         self.setProgramMode(ProgramMode.Editing)
         self.setSegment(Segment.FinalJeopardy)
+        self.revealCategories()
 
     def edit_cut(self):
         print("Got to edit_cut.")
@@ -102,7 +109,7 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
 
     def game_names(self):
         print("Got to game_names.")
-        self.board.clue_displays[2][1].display_state = DisplayState.Clue
+        self.clue_displays[2][1].display_state = DisplayState.Clue
 
     def game_practice(self):
         print("Got to game_practice.")
@@ -110,20 +117,33 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
     def game_play_jeopardy(self):
         print("Got to game_play_jeopardy.")
         self.setProgramMode(ProgramMode.Playing)
-        self.game_segment = Segment.Jeopardy
+        self.setSegment(Segment.Jeopardy)
+        self.hideCategories(Segment.Jeopardy)
 
     def game_play_double_jeopardy(self):
         print("Got to game_play_double_jeopardy")
         self.setProgramMode(ProgramMode.Playing)
-        self.game_segment = Segment.DoubleJeopardy
+        self.setSegment(Segment.DoubleJeopardy)
+        self.hideCategories(Segment.DoubleJeopardy)
 
     def game_play_final_jeopardy(self):
         print("Got to game_play_final_jeoardy")
         self.setProgramMode(ProgramMode.Playing)
-        self.game_segment = Segment.FinalJeopardy
+        self.setSegment(Segment.FinalJeopardy)
+        self.hideCategories(Segment.FinalJeopardy)
 
     def game_correct(self):
         print("Got to game_correct.")
+
+    def game_end(self):
+        """
+        Ends the current game and places the program in Neutral mode
+        :return: None
+        """
+        print("Got to game_end")
+        # :todo: First there should be a warning message before ending the game
+        self.setProgramMode(ProgramMode.Neutral)
+
 
     def game_settings(self):
         print("Got to game_settings.")
@@ -144,21 +164,46 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
 
     def setProgramMode(self, mode):
         self.program_mode = mode
-        if mode == ProgramMode.Neutral:
+        if mode == ProgramMode.Empty:
+            self.file_open_action.setEnabled(True)
+            self.file_create_action.setEnabled(True)
             self.file_close_action.setEnabled(False)
             self.file_save_action.setEnabled(False)
             self.file_save_as_action.setEnabled(False)
             self.file_print_action.setEnabled(False)
-            if self.game_loaded:
-                self.edit_modifyMenu.setEnabled(True)
-            else:
-                self.edit_modifyMenu.setEnabled(False)
+            self.edit_modifyMenu.setEnabled(False)
             self.edit_cut_action.setEnabled(False)
             self.edit_copy_action.setEnabled(False)
             self.edit_paste_action.setEnabled(False)
+            self.game_names_action.setEnabled(True)
+            self.game_practice_action.setEnabled(True)
             self.game_playMenu.setEnabled(False)
             self.game_correct_action.setEnabled(False)
+            self.game_end_action.setEnabled(False)
+        elif mode == ProgramMode.Neutral:
+            self.file_open_action.setEnabled(True)
+            self.file_create_action.setEnabled(True)
+            self.file_close_action.setEnabled(True)
+            self.file_create_action.setEnabled(True)
+            self.file_close_action.setEnabled(True)
+            self.file_save_action.setEnabled(True)
+            self.file_save_as_action.setEnabled(True)
+            self.file_print_action.setEnabled(True)
+            self.edit_modifyMenu.setEnabled(True)
+            self.edit_cut_action.setEnabled(False)
+            self.edit_copy_action.setEnabled(False)
+            self.edit_paste_action.setEnabled(False)
+            self.game_names_action.setEnabled(True)
+            self.game_practice_action.setEnabled(True)
+            if self.game.playable:
+                self.game_playMenu.setEnabled(True)
+            else:
+                self.game_playMenu.setEnabled(False)
+            self.game_correct_action.setEnabled(False)
+            self.game_end_action.setEnabled(False)
         elif mode == ProgramMode.Editing:
+            self.file_open_action.setEnabled(True)
+            self.file_create_action.setEnabled(True)
             self.file_close_action.setEnabled(True)
             self.file_save_action.setEnabled(True)
             self.file_save_as_action.setEnabled(True)
@@ -166,28 +211,29 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
             self.edit_modifyMenu.setEnabled(True)
             self.edit_cut_action.setEnabled(True)
             self.edit_copy_action.setEnabled(True)
+            # the availability of the paste option should depend on whether there is anything on the clipboard
             self.edit_paste_action.setEnabled(True)
-            if self.game.playable:
-                self.game_playMenu.setEnabled(True)
-                self.game_correct_action.setEnabled(True)
-            else:
-                self.game_playMenu.setEnabled(False)
-                self.game_correct_action.setEnabled(False)
+            self.game_names_action.setEnabled(False)
+            self.game_practice_action.setEnabled(False)
+            self.game_playMenu.setEnabled(False)
+            self.game_correct_action.setEnabled(False)
+            self.game_end_action.setEnabled(False)
         elif mode == ProgramMode.Playing:
-            self.file_close_action.setEnabled(True)
+            self.file_open_action.setEnabled(False)
+            self.file_create_action.setEnabled(False)
+            self.file_close_action.setEnabled(False)
             self.file_save_action.setEnabled(False)
             self.file_save_as_action.setEnabled(False)
-            self.file_print_action.setEnabled(True)
-            self.edit_modifyMenu.setEnabled(True)
+            self.file_print_action.setEnabled(False)
+            self.edit_modifyMenu.setEnabled(False)
             self.edit_cut_action.setEnabled(False)
             self.edit_copy_action.setEnabled(False)
             self.edit_paste_action.setEnabled(False)
-            if self.game.playable:
-                self.game_playMenu.setEnabled(True)
-                self.game_correct_action.setEnabled(True)
-            else:
-                self.game_playMenu.setEnabled(False)
-                self.game_correct_action.setEnabled(False)
+            self.game_names_action.setEnabled(True)
+            self.game_practice_action.setEnabled(True)
+            self.game_playMenu.setEnabled(True)
+            self.game_correct_action.setEnabled(True)
+            self.game_end_action.setEnabled(True)
         else:
             print("setProgramMode called with unrecognized mode.")
 
@@ -201,7 +247,108 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
         :return: None
         """
         self.game_segment = segment
-        self.board.fillBoard(self.game, segment)
+        self.fillBoard(self.game, segment)
+
+    def createBoard(self, screen_geometry, scene):
+        """
+        Creates a blank Jeopardy board for later use
+        :param size: QFSize telling the width and height of the display units for this screen
+        :return: None
+        """
+        # compute the size of the DisplayUnits
+        display_unit_width = screen_geometry.width() * 0.1  # calculates 10% of the available height
+        display_unit_height = display_unit_width * 9/16       # maintain a 16:9 aspect ratio
+        display_unit_size = QSizeF(display_unit_width, display_unit_height)
+
+
+        # calculate the gap between display units (5% of the width of the unit)
+        gap = display_unit_size.width()/20
+
+        # Create the category displays
+        self.category_displays = []
+        for col in range(6):
+            element = DisplayUnit(display_unit_size, type=DisplayType.Category)
+            element.setPos(col * (display_unit_size.width() + gap), 0)
+            element.display_state = DisplayState.Blank
+            self.category_displays.append(element)
+            scene.addItem(element)
+
+        # Create the clue displays
+        self.clue_displays = []
+        for col in range(6):
+            row_list = []
+            for row in range(5):
+                element = DisplayUnit(display_unit_size, DisplayType.Clue)
+                element.setPos(col * (display_unit_size.width() + gap),
+                               display_unit_size.height() + 2 * gap + row * (display_unit_size.height() + gap))
+                element.display_state = DisplayState.Blank
+                scene.addItem(element)
+                row_list.append(element)
+            self.clue_displays.append(row_list)
+
+    def hideCategories(self, segment):
+        """
+        Covers the category names with a graphic depending on the segment, Jeopardy, Double Jeopardy or Final Jeopardy.
+        :param: segment - ProgramSegment.Jeopardy, ProgramSegment.DoubleJeopardy or ProgramSegment.FinalJeopardy
+        :return: None
+        """
+        for category_display in self.category_displays:
+            category_display.hide_category = True
+            if segment == Segment.Jeopardy:
+                category_display.category_cover = QPixmap('../images/JeopardyCard.png')
+            elif segment == Segment.DoubleJeopardy:
+                category_display.category_cover = QPixmap('../images/DoubleJeopardyCard.png')
+            else:
+                category_display.category_cover = QPixmap('../images/FinalJeopardyCard.png')
+
+    def revealCategories(self):
+        """
+        Reveals the categories (if hidden) by changing DisplayUnit.hide_category to False on all of the category units
+        :return:
+        """
+        for category_display in self.category_displays:
+            category_display.hide_category = False
+
+    def revealCategory(self, number):
+        """
+        Reveals the category represented by number
+        :param number: an integer 0 through 5
+        :return: None
+        """
+        self.category_displays[number].hide_category = False
+
+    def fillBoard(self, game, segment):
+        """
+        Fills all of the Category and Clue units
+        :param game: an instance of the Game class
+        :param segment: a member of the Segment class: Segment.Jeopardy, Segment.DoubleJeopardy or Segment.FinalJeopardy
+        :return: None
+        """
+        if segment == Segment.Jeopardy or segment == Segment.DoubleJeopardy:
+            categories = game.get_categories(segment)
+            col = 0
+            for category in categories:
+                self.category_displays[col].category_text = category.title
+                self.category_displays[col].category_explanation = category.explanation
+                # the following line is temporary. Later it should display a "Jeopardy" or "Double Jeopardy" card
+                #  covering the category unless the game is being edited then the category name should show
+                # this means the games should be opened in ProgramMode.Neutral and it calls for another
+                # DisplayState
+                self.category_displays[col].display_state = DisplayState.Category
+                row = 0
+                for item in category.items:
+                    if segment == Segment.Jeopardy:
+                        self.clue_displays[col][row].amount = self.base_amount + self.base_amount * row
+                    elif segment == Segment.DoubleJeopardy:
+                        self.clue_displays[col][row].amount = 2 * self.base_amount + 2 * self.base_amount * row
+                    self.clue_displays[col][row].clue = item.clue
+                    self.clue_displays[col][row].correct_response = item.response
+                    self.clue_displays[col][row].display_state = DisplayState.Dollars
+                    row += 1
+                col += 1
+        else:
+            # fill the board for game.final_jeopardy[]
+            pass
 
 
 if __name__ == "__main__":

@@ -110,136 +110,141 @@ class DisplayUnit(QGraphicsItem):
         # That worked! Now for the vertical centering
 
         y_offset = (self.size.height() - graphics_text_item.boundingRect().height())/2
-        shadow_offset = self.size.width() * .01
-        graphics_text_item.setPos(shadow_offset, shadow_offset + y_offset)
-        graphics_text_item.setPos(0.0, y_offset)
-
         graphics_text_item.setPos(0, y_offset)
 
         return graphics_text_item
 
+    def mousePressEvent(self, event):
+        print("Got to mousePressEvent in DisplayUnit with event: ", event)
+        self.clue = "Testing"
+        self.displayText()
 
-class Board(QGraphicsItem):
 
-    def __init__(self, screenGeometry, scene, parent=None):
-
-        super(Board, self).__init__(parent)
-
-        self.base_amount = 200                  # the smallest number of dollars or points
-                                                # by using this variable you can opt to change it later
-        # compute the size of the DisplayUnits
-        display_unit_width = screenGeometry.width() * 0.1  # calculates 10% of the available height
-        display_unit_height = display_unit_width * 9/16       # maintain a 16:9 aspect ratio
-        display_unit_size = QSizeF(display_unit_width, display_unit_height)
-
-        self.createBoard(display_unit_size, scene)
-
-    # The following two methods are mandatory when subclassing QGraphicsItem
-
-    def boundingRect(self):
-        return QRectF(0, 0, self.size.width(), self.size.height())
-
-    def paint(self, painter, option, widget):
-        # paints all of the DisplayUnits in their current state
-        print("In Board.paint()")
-        for element in self.category_displays:
-            print("Painting a category display")
-            element.paint(painter, option, widget)
-        for column in self.clue_displays:
-            print("Painting a clue display")
-            for element in column:
-                element.paint(painter, option, widget)
-
-    def createBoard(self, size, scene):
-        """
-        Creates a blank Jeopardy board for later use
-        :param size: QFSize telling the width and height of the display units for this screen
-        :return: None
-        """
-        # calculate the gap between display units (5% of the width of the unit)
-        gap = size.width()/20
-
-        # Create the category displays
-        self.category_displays = []
-        for col in range(6):
-            element = DisplayUnit(size, type=DisplayType.Category)
-            element.setPos(col * (size.width() + gap), 0)
-            element.display_state = DisplayState.Blank
-            self.category_displays.append(element)
-            scene.addItem(element)
-
-        # Create the clue displays
-        self.clue_displays = []
-        for col in range(6):
-            row_list = []
-            for row in range(5):
-                element = DisplayUnit(size, DisplayType.Clue)
-                element.setPos(col * (size.width() + gap), size.height() + 2 * gap + row * (size.height() + gap))
-                element.display_state = DisplayState.Blank
-                scene.addItem(element)
-                row_list.append(element)
-            self.clue_displays.append(row_list)
-
-    def fillBoard(self, game, segment):
-        """
-        Fills all of the Category and Clue units
-        :param game: an instance of the Game class
-        :param segment: a member of the Segment class: Segment.Jeopardy, Segment.DoubleJeopardy or Segment.FinalJeopardy
-        :return: None
-        """
-        if segment == Segment.Jeopardy or segment == Segment.DoubleJeopardy:
-            categories = game.get_categories(segment)
-            col = 0
-            for category in categories:
-                self.category_displays[col].category_text = category.title
-                self.category_displays[col].category_explanation = category.explanation
-                # the following line is temporary. Later it should display a "Jeopardy" or "Double Jeopardy" card
-                #  covering the category unless the game is being edited then the category name should show
-                # this means the games should be opened in ProgramMode.Neutral and it calls for another
-                # DisplayState
-                self.category_displays[col].display_state = DisplayState.Category
-                row = 0
-                for item in category.items:
-                    if segment == Segment.Jeopardy:
-                        self.clue_displays[col][row].amount = self.base_amount + self.base_amount * row
-                    elif segment == Segment.DoubleJeopardy:
-                        self.clue_displays[col][row].amount = 2 * self.base_amount + 2 * self.base_amount * row
-                    self.clue_displays[col][row].clue = item.clue
-                    self.clue_displays[col][row].correct_response = item.response
-                    self.clue_displays[col][row].display_state = DisplayState.Dollars
-                    row += 1
-                col += 1
-        else:
-            # fill the board for game.final_jeopardy[]
-            pass
-
-    def setCategoriesHidden(self, segment):
-        """
-        Covers the category names with a graphic depending on the segment, Jeopardy, Double Jeopardy or Final Jeopardy.
-        :param: segment - ProgramSegment.Jeopardy, ProgramSegment.DoubleJeopardy or ProgramSegment.FinalJeopardy
-        :return: None
-        """
-        for category_display in self.category_displays:
-            category_display.hide_category = True
-            if segment == Segment.Jeopardy:
-                category_display.category_cover = QPixmap('../images/JeopardyCard.png')
-            elif segment == Segment.DoubleJeopardy:
-                category_display.category_cover = QPixmap('../images/JeopardyCard.png')
-            else:
-                category_display.category_cover = QPixmap('../images/JeopardyCard.png')
-
-    def revealCategories(self):
-        """
-        Reveals the categories (if hidden) by changing DisplayUnit.hide_category to False on all of the category units
-        :return:
-        """
-        for category_display in self.category_displays:
-            category_display.hide_category = False
-
-    def revealCategory(self, number):
-        """
-        Reveals the category represented by number
-        :param number: an integer 0 through 5
-        :return: None
-        """
-        self.category_displays[number].hide_category = False
+# class Board(QGraphicsItem): # does the Board have to be a QGraphicsItem, am I thinking more of a BoardManager class?
+#                             # should Board inherit from QGraphicsScene instead?
+#
+#     def __init__(self, screenGeometry, scene, parent=None):
+#
+#         super(Board, self).__init__(parent)
+#
+#         self.base_amount = 200                  # the smallest number of dollars or points
+#                                                 # by using this variable you can opt to change it later
+#         # compute the size of the DisplayUnits
+#         display_unit_width = screenGeometry.width() * 0.1  # calculates 10% of the available height
+#         display_unit_height = display_unit_width * 9/16       # maintain a 16:9 aspect ratio
+#         display_unit_size = QSizeF(display_unit_width, display_unit_height)
+#
+#         self.createBoard(display_unit_size, scene)
+#
+#     # The following two methods are mandatory when subclassing QGraphicsItem
+#
+#     def boundingRect(self):
+#         return QRectF(0, 0, self.size.width(), self.size.height())
+#
+#     def paint(self, painter, option, widget):
+#         # paints all of the DisplayUnits in their current state
+#         print("In Board.paint()")
+#         for element in self.category_displays:
+#             print("Painting a category display")
+#             element.paint(painter, option, widget)
+#         for column in self.clue_displays:
+#             print("Painting a clue display")
+#             for element in column:
+#                 element.paint(painter, option, widget)
+#
+#     def createBoard(self, size, scene):
+#         """
+#         Creates a blank Jeopardy board for later use
+#         :param size: QFSize telling the width and height of the display units for this screen
+#         :return: None
+#         """
+#         # calculate the gap between display units (5% of the width of the unit)
+#         gap = size.width()/20
+#
+#         # Create the category displays
+#         self.category_displays = []
+#         for col in range(6):
+#             element = DisplayUnit(size, type=DisplayType.Category)
+#             element.setPos(col * (size.width() + gap), 0)
+#             element.display_state = DisplayState.Blank
+#             self.category_displays.append(element)
+#             scene.addItem(element)
+#
+#         # Create the clue displays
+#         self.clue_displays = []
+#         for col in range(6):
+#             row_list = []
+#             for row in range(5):
+#                 element = DisplayUnit(size, DisplayType.Clue)
+#                 element.setPos(col * (size.width() + gap), size.height() + 2 * gap + row * (size.height() + gap))
+#                 element.display_state = DisplayState.Blank
+#                 scene.addItem(element)
+#                 row_list.append(element)
+#             self.clue_displays.append(row_list)
+#
+#     def fillBoard(self, game, segment):
+#         """
+#         Fills all of the Category and Clue units
+#         :param game: an instance of the Game class
+#         :param segment: a member of the Segment class: Segment.Jeopardy, Segment.DoubleJeopardy or Segment.FinalJeopardy
+#         :return: None
+#         """
+#         if segment == Segment.Jeopardy or segment == Segment.DoubleJeopardy:
+#             categories = game.get_categories(segment)
+#             col = 0
+#             for category in categories:
+#                 self.category_displays[col].category_text = category.title
+#                 self.category_displays[col].category_explanation = category.explanation
+#                 # the following line is temporary. Later it should display a "Jeopardy" or "Double Jeopardy" card
+#                 #  covering the category unless the game is being edited then the category name should show
+#                 # this means the games should be opened in ProgramMode.Neutral and it calls for another
+#                 # DisplayState
+#                 self.category_displays[col].display_state = DisplayState.Category
+#                 row = 0
+#                 for item in category.items:
+#                     if segment == Segment.Jeopardy:
+#                         self.clue_displays[col][row].amount = self.base_amount + self.base_amount * row
+#                     elif segment == Segment.DoubleJeopardy:
+#                         self.clue_displays[col][row].amount = 2 * self.base_amount + 2 * self.base_amount * row
+#                     self.clue_displays[col][row].clue = item.clue
+#                     self.clue_displays[col][row].correct_response = item.response
+#                     self.clue_displays[col][row].display_state = DisplayState.Dollars
+#                     row += 1
+#                 col += 1
+#         else:
+#             # fill the board for game.final_jeopardy[]
+#             pass
+#
+#     def setCategoriesHidden(self, segment):
+#         """
+#         Covers the category names with a graphic depending on the segment, Jeopardy, Double Jeopardy or Final Jeopardy.
+#         :param: segment - ProgramSegment.Jeopardy, ProgramSegment.DoubleJeopardy or ProgramSegment.FinalJeopardy
+#         :return: None
+#         """
+#         for category_display in self.category_displays:
+#             category_display.hide_category = True
+#             if segment == Segment.Jeopardy:
+#                 category_display.category_cover = QPixmap('../images/JeopardyCard.png')
+#             elif segment == Segment.DoubleJeopardy:
+#                 category_display.category_cover = QPixmap('../images/DoubleJeopardyCard.png')
+#             else:
+#                 category_display.category_cover = QPixmap('../images/FinalJeopardyCard.png')
+#
+#     def revealCategories(self):
+#         """
+#         Reveals the categories (if hidden) by changing DisplayUnit.hide_category to False on all of the category units
+#         :return:
+#         """
+#         for category_display in self.category_displays:
+#             category_display.hide_category = False
+#
+#     def revealCategory(self, number):
+#         """
+#         Reveals the category represented by number
+#         :param number: an integer 0 through 5
+#         :return: None
+#         """
+#         self.category_displays[number].hide_category = False
+#
+#     def mousePressEvent(self, event):
+#         print("Got to mousePressEvent in Board.")
