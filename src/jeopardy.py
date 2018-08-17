@@ -14,7 +14,6 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
         self.app = app
         self.screen_geometry = self.getScreenGeometry()
         self.createUI()
-        self.createBoard(self.screen_geometry, self.stage_set)
         self.game_loaded = False
 
         # class variables (is class variables the correct name?)
@@ -25,8 +24,13 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
         self.setProgramMode(ProgramMode.Empty)
         self.game_segment = Segment.Jeopardy
 
+        self.category_font = QFont("Arial", 36)
+        self.clue_font = QFont("Times New Roman", 18)
+        self.number_font = QFont("Arial", 32, QFont.Bold)
+
         self.base_amount = 200                  # the smallest number of dollars or points
                                                 # by using this variable you can opt to change it later
+        self.createBoard(self.screen_geometry, self.stage_set)
 
     def getScreenGeometry(self):
         desktop = self.app.desktop()
@@ -256,7 +260,7 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
         :return: None
         """
         # compute the size of the DisplayUnits
-        display_unit_width = screen_geometry.width() * 0.1  # calculates 10% of the available height
+        display_unit_width = screen_geometry.width() * 0.1  # calculates 10% of the available width
         display_unit_height = display_unit_width * 9/16       # maintain a 16:9 aspect ratio
         display_unit_size = QSizeF(display_unit_width, display_unit_height)
 
@@ -267,9 +271,9 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
         # Create the category displays
         self.category_displays = []
         for col in range(6):
-            element = DisplayUnit(display_unit_size, type=DisplayType.Category)
+            element = DisplayUnit(display_unit_size, self, font=self.category_font, color=QColor(Qt.white), text="")
             element.setPos(col * (display_unit_size.width() + gap), 0)
-            element.display_state = DisplayState.Blank
+            # element.display_state = DisplayState.Blank
             self.category_displays.append(element)
             scene.addItem(element)
 
@@ -278,10 +282,10 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
         for col in range(6):
             row_list = []
             for row in range(5):
-                element = DisplayUnit(display_unit_size, DisplayType.Clue)
+                element = DisplayUnit(display_unit_size, self, font=self.clue_font, color=QColor(Qt.white), text="")
                 element.setPos(col * (display_unit_size.width() + gap),
                                display_unit_size.height() + 2 * gap + row * (display_unit_size.height() + gap))
-                element.display_state = DisplayState.Blank
+                # element.display_state = DisplayState.Blank
                 scene.addItem(element)
                 row_list.append(element)
             self.clue_displays.append(row_list)
