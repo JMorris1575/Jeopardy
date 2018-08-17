@@ -30,6 +30,10 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
 
         self.base_amount = 200                  # the smallest number of dollars or points
                                                 # by using this variable you can opt to change it later
+
+        self.gamefile_changed = True            # temporarily initialized to True while building checkForSave feature
+        self.game_filename = ""
+
         self.createBoard(self.screen_geometry, self.stage_set)
 
     def getScreenGeometry(self):
@@ -40,12 +44,14 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
     def setProgramMode(self, mode):
         self.program_mode = mode
         if mode == ProgramMode.Empty:
+            self.stage_set.setBackgroundBrush(QColor(Qt.black))
             self.file_open_action.setEnabled(True)
             self.file_create_action.setEnabled(True)
             self.file_close_action.setEnabled(False)
             self.file_save_action.setEnabled(False)
             self.file_save_as_action.setEnabled(False)
             self.file_print_action.setEnabled(False)
+            self.edit_exit_editing_action.setEnabled(False)
             self.edit_modifyMenu.setEnabled(False)
             self.edit_cut_action.setEnabled(False)
             self.edit_copy_action.setEnabled(False)
@@ -56,6 +62,7 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
             self.game_correct_action.setEnabled(False)
             self.game_end_action.setEnabled(False)
         elif mode == ProgramMode.Neutral:
+            self.stage_set.setBackgroundBrush(QColor(Qt.black))
             self.file_open_action.setEnabled(True)
             self.file_create_action.setEnabled(True)
             self.file_close_action.setEnabled(True)
@@ -65,6 +72,7 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
             self.file_save_as_action.setEnabled(True)
             self.file_print_action.setEnabled(True)
             self.edit_modifyMenu.setEnabled(True)
+            self.edit_exit_editing_action.setEnabled(False)
             self.edit_cut_action.setEnabled(False)
             self.edit_copy_action.setEnabled(False)
             self.edit_paste_action.setEnabled(False)
@@ -77,6 +85,7 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
             self.game_correct_action.setEnabled(False)
             self.game_end_action.setEnabled(False)
         elif mode == ProgramMode.Editing:
+            self.stage_set.setBackgroundBrush(QColor(Qt.darkGray))
             self.file_open_action.setEnabled(True)
             self.file_create_action.setEnabled(True)
             self.file_close_action.setEnabled(True)
@@ -84,6 +93,7 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
             self.file_save_as_action.setEnabled(True)
             self.file_print_action.setEnabled(True)
             self.edit_modifyMenu.setEnabled(True)
+            self.edit_exit_editing_action.setEnabled(True)
             self.edit_cut_action.setEnabled(True)
             self.edit_copy_action.setEnabled(True)
             # the availability of the paste option should depend on whether there is anything on the clipboard
@@ -94,6 +104,7 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
             self.game_correct_action.setEnabled(False)
             self.game_end_action.setEnabled(False)
         elif mode == ProgramMode.Playing:
+            self.stage_set.setBackgroundBrush(QColor(Qt.black))
             self.file_open_action.setEnabled(False)
             self.file_create_action.setEnabled(False)
             self.file_close_action.setEnabled(False)
@@ -101,6 +112,7 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
             self.file_save_as_action.setEnabled(False)
             self.file_print_action.setEnabled(False)
             self.edit_modifyMenu.setEnabled(False)
+            self.edit_exit_editing_action.setEnabled(False)
             self.edit_cut_action.setEnabled(False)
             self.edit_copy_action.setEnabled(False)
             self.edit_paste_action.setEnabled(False)

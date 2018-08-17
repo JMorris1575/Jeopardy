@@ -203,4 +203,26 @@ itself will appear according to whether I do it the easy way or can figure out h
 Jim can click on Edit->Modify to enter or edit categories and clues for Double Jeopardy and Final Jeopardy.
 
 After each entry the game is checked for completeness. If it is complete it is marked as playable and will appear in
-the File->Open... dialog box
+the File->Open... dialog box.
+
+Implementing the Editing Process
+================================
+
+I will start out with the "Easy Way" described above and, to keep the "views" and the "controller" separate, will create
+a new file: ``dialogs.py`` to contain all of the dialog boxes I build.
+
+Here is a quick plan for implementation, kind of Test-Driven-Development like:
+
+#. Write a call to check whether a game in memory has changed in file_create
+
+#. Write the routine to chec whether a game in memory has changed
+
+#. Once saving things as appropriate create a new Game() and enter the info dialog box.
+
+#. Create the info dialog box.
+
+#. Wire up file_save_as to save a file.
+
+#. Wire up file_save to check if file_save_as is more appropriate and then save the file.
+
+That should be enough for now.

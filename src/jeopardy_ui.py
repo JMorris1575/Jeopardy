@@ -15,14 +15,6 @@ class Stage(QGraphicsView):
 
 class JeopardyUI(object):
 
-    # def getElementSize(self):
-    #     desktop = self.app.desktop()
-    #     screenNumber = desktop.screenNumber(self)  # gets the screen the form is on
-    #     screenGeometry = desktop.availableGeometry(screenNumber)  # as a QRect
-    #     element_width = screenGeometry.width() * 0.1  # calculates 10% of the available height
-    #     element_height = element_width * 9/16       # maintain a 16:9 aspect ratio
-    #     return QSizeF(element_width, element_height)
-
     def createUI(self):
 
         ##########################################
@@ -83,6 +75,8 @@ class JeopardyUI(object):
         self.edit_modify_final_jeopardy_action = self.edit_modifyMenu.addAction("&Final Jeopardy")
         self.edit_modify_final_jeopardy_action.setToolTip("Edit Items for the Final Jeopardy Segment")
         self.edit_modify_final_jeopardy_action.triggered.connect(self.edit_modify_final_jeopardy)
+        self.edit_exit_editing_action = editMenu.addAction("E&xit Editing")
+        self.edit_exit_editing_action.triggered.connect(self.edit_exit_editing)
 
         editMenu.addSeparator()
 
@@ -148,39 +142,7 @@ class JeopardyUI(object):
 
         self.stage_set = QGraphicsScene()
         self.stage_set.setBackgroundBrush(Qt.black)
-        # self.board = Board(screenGeometry, self.scene)
 
-
-        # desktop = self.app.desktop()
-        # size = self.getElementSize()
-        # gap = size.width()/20
-        #
-        # self.category_displays = []
-        # for col in range(6):
-        #     element = DisplayUnit(size, type=DisplayType.Category)
-        #     element.setPos(col * (size.width() + gap), 0)
-        #     element.category_text = "This is a Category"
-        #     element.category_explanation = "This is the explanation of the Category"
-        #     element.display_state = DisplayState.Waiting
-        #     self.category_displays.append(element)
-        #     self.scene.addItem(element)
-        # self.clue_displays = []
-        # for col in range(6):
-        #     row_list = []
-        #     for row in range(5):
-        #         element = DisplayUnit(size, DisplayType.Clue)
-        #         element.setPos(col * (size.width() + gap), size.height() + 2 * gap + row * (size.height() + gap))
-        #         element.clue = "This is the Clue"
-        #         element.correct_response = "This is the Correct Response"
-        #         element.amount = 200
-        #         element.display_state = DisplayState.Dollars
-        #         self.scene.addItem(element)
-        #         row_list.append(element)
-        #     self.clue_displays.append(row_list)
-
-
-
-        # self.view = Stage()
         self.view = QGraphicsView()
         self.view.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.view.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
@@ -197,7 +159,11 @@ class JeopardyUI(object):
         print("Got to file_open.")
         print("Opening temporary game file: 'temp_saved_game'")
         if self.game_modified:
-            print("Write the code to ask if the user wants to save the current game before opening a new one.")
+            # Check to see if the file in memory needs saving
+            if self.game_modified:
+                result = self.checkForSave()
+                if result == QMessageBox.Cancel:
+                    return
         self.game = self.game.read_game('temp_saved_game')
         self.game.playable = True
         print("The game is marked playable = ", self.game.playable)
@@ -209,8 +175,14 @@ class JeopardyUI(object):
     def file_create(self):
         print("Got to file_create.")
         self.game_loaded = True
+        # Check to see if the file in memory needs saving
+        if self.game_modified:
+            result = self.checkForSave()
+            if result == QMessageBox.Cancel:
+                return
+        print("Creating a new game.")
+        self.game = Game()
         self.setProgramMode(ProgramMode.Editing)
-        self.board.category_displays[3].display_state = DisplayState.Category
 
     def file_close(self):
         print("Got to file_close.")
@@ -257,6 +229,10 @@ class JeopardyUI(object):
         self.setProgramMode(ProgramMode.Editing)
         self.setSegment(Segment.FinalJeopardy)
         self.revealCategories()
+
+    def edit_exit_editing(self):
+        print("Got to edit_exit_editing.")
+        self.setProgramMode(ProgramMode.Neutral)
 
     def edit_cut(self):
         print("Got to edit_cut.")
@@ -322,3 +298,21 @@ class JeopardyUI(object):
     def help_about(self):
         print("Got to help_about.")
 
+
+    # Support Functions -- these may be later moved to jeopardy.py
+
+    def checkForSave(self):
+        """
+        Checks if the user wants to save the current game file and, if so, saves it
+        :return: QMessageBox response - either Save, Discard or Cancel
+        """
+        title = "Check For Save"
+        message = "The current game file has been modified, do you want to save it?"
+        buttons = QMessageBox.Save | QMessageBox.Discard | QMessageBox.Cancel
+        icon = QMessageBox.Question
+        msgBox = QMessageBox(icon, title, message, buttons, self)
+        msgBox.setDefaultButton(QMessageBox.Save)
+        result = msgBox.exec()
+        if result == QMessageBox.Save:
+            self.file_save()
+        return result
