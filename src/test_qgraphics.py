@@ -11,13 +11,15 @@ class TestItem(QGraphicsItem):
         self.controller = controller
         # self.position = pos
         self.size = size
-        self.font = font
-        self.text = text
-        self._shadow_text = QGraphicsTextItem(self)
-        self._text_item = QGraphicsTextItem(self.text, self)
 
+        self.font = font
         self.color = color
-        # self.setText(text, color)
+
+        self.text = text
+        self._shadow_text = QGraphicsTextItem(self.text, self)
+        self._shadow_text.setDefaultTextColor(QColor(Qt.black))
+        self._text_item = QGraphicsTextItem(self.text, self)
+        self._text_item.setDefaultTextColor(QColor(self.color))
 
     def __str__(self):
         return self.id
@@ -32,36 +34,21 @@ class TestItem(QGraphicsItem):
         painter.drawPixmap(target, pixmap, source)
         self.formatText()
 
-    # def setText(self, text, color):
-    #     self.text = text
-    #     self._shadow_text = QGraphicsTextItem(self.text, self)
-    #     self._shadow_text.setFont(self.font)
-    #     self._shadow_text.setDefaultTextColor(QColor(Qt.black))
-    #     self._text_item = QGraphicsTextItem(self.text, self)
-    #     self._text_item.setFont(self.font)
-    #     self._text_item.setDefaultTextColor(color)
-    #     #self._text_item.setDefaultTextColor(QColor(Qt.yellow))
-    #     self.formatText()
-
     def formatText(self):
         """
-        Adjusts self._foreground_text and self._shadow_text to display as a shadowed font.
-        :param text: a String - the text to be adjusted
-        :param font: the font to be used for this text
-        :return:
+        Adjusts self._text_item and self._shadow_text to display as a shadowed font.
+        :return: None
         """
-        # self._shadow_text = QGraphicsTextItem(self)   # if I have this here it keeps adding to the scene items
+        self.font.setCapitalization(QFont.AllUppercase)
+        font_metrics = QFontMetrics(self.font)
         self._shadow_text.setPlainText(self.text)
         self._shadow_text.setFont(self.font)
-        self._shadow_text.setDefaultTextColor(QColor(Qt.black))
         self._shadow_text = self.centerText(self._shadow_text,)
-        shadow_offset = self.size.width() * 0.005
+        shadow_offset = font_metrics.capHeight() * 0.07
         self._shadow_text.moveBy(shadow_offset, shadow_offset)
 
-        # self._text_item = QGraphicsTextItem(self.text, self)
         self._text_item.setPlainText(self.text)
         self._text_item.setFont(self.font)
-        self._text_item.setDefaultTextColor(self.color)
         self._text_item = self.centerText(self._text_item)                # foreground is not offset
 
     def centerText(self, graphics_text_item):
@@ -81,6 +68,7 @@ class TestItem(QGraphicsItem):
         # That worked! Now for the vertical centering
 
         y_offset = (self.size.height() - graphics_text_item.boundingRect().height())/2
+
         shadow_offset = self.size.width() * .01
         graphics_text_item.setPos(shadow_offset, shadow_offset + y_offset)
         graphics_text_item.setPos(0.0, y_offset)
