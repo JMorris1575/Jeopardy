@@ -161,7 +161,7 @@ class DisplayUnit(QGraphicsItem):
 
     def mouseDoubleClickEvent(self, event):
         print("Got to mousePressEvent in DisplayUnit with event: ", event)
-        print(event.button())
+        print("Mouse event.button() = ", event.button())
         self.text = "Testing"
 
 # class DisplayUnitBak(QGraphicsItem):

@@ -200,6 +200,7 @@ class JeopardyUI(object):
 
     def closeEvent(self, event):
         print("Got to closeEvent.", event)
+        self.font_database.removeApplicationFont(self.clue_font_id)
         # check for unsaved files here
 
     def edit_modify_info(self):

@@ -25,7 +25,12 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
         self.game_segment = Segment.Jeopardy
 
         self.category_font = QFont("Arial", 18)
-        self.clue_font = QFont("Times New Roman", 18)
+        self.font_database = QFontDatabase()
+        self.clue_font_id = self.font_database.addApplicationFont("../fonts/GenBkBasBI.ttf")
+        if self.clue_font_id != -1:
+            self.clue_font = QFont("Gentium Book Basic", 18)
+        else:
+            self.clue_font = QFont("Times New Roman", 18)
         self.number_font = QFont("Arial", 32, QFont.Bold)
 
         self.base_amount = 200                  # the smallest number of dollars or points
