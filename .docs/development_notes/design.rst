@@ -265,3 +265,14 @@ files that will hold the games. Here is a tentative plan:
     #. Once saved, if the user wishes to do so, erase that game.
     #. Leave the program in ProgramMode.Editing mode with the board set to Segment.Jeopardy and ready to edit game info.
 
+Rethinking the DisplayUnits
+===========================
+
+I'm having an awful time deciding what the DisplayUnits should do. On the one hand it would be nice if they knew by
+themselves how to display whatever they had to display according to their DisplayState. But that seems to require that
+they be in charge of the fonts, colors and sizes of what is to be printed.
+
+Is that so bad? Right now I've got the fonts defined in ``jeopardy.py``, maybe they need to be defined in
+``graphic_objects.py``. Why should the main program have to bother its pretty head about such things. It just needs to
+be able to tell it what to display. How it gets displayed is the DisplayUnit's job.
+

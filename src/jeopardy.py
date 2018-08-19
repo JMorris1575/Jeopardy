@@ -7,6 +7,7 @@ import jeopardy_ui
 from models import *
 from graphic_objects import *
 
+
 class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
 
     def __init__(self, app, parent=None):
@@ -159,9 +160,9 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
         # Create the category displays
         self.category_displays = []
         for col in range(6):
-            element = DisplayUnit(display_unit_size, self, font=self.category_font, color=QColor(Qt.white), text="")
+            element = DisplayUnit(display_unit_size, DisplayType.Category, self)
             element.setPos(col * (display_unit_size.width() + gap), 0)
-            # element.display_state = DisplayState.Blank
+            element.setDisplayState(DisplayState.Blank)
             self.category_displays.append(element)
             scene.addItem(element)
 
@@ -170,10 +171,10 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
         for col in range(6):
             row_list = []
             for row in range(5):
-                element = DisplayUnit(display_unit_size, self, font=self.clue_font, color=QColor(Qt.white), text="")
+                element = DisplayUnit(display_unit_size, DisplayType.Clue, self)
                 element.setPos(col * (display_unit_size.width() + gap),
                                display_unit_size.height() + 2 * gap + row * (display_unit_size.height() + gap))
-                # element.display_state = DisplayState.Blank
+                element.setDisplayState(DisplayState.Blank)
                 scene.addItem(element)
                 row_list.append(element)
             self.clue_displays.append(row_list)
@@ -220,22 +221,22 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
             categories = game.get_categories(segment)
             col = 0
             for category in categories:
-                self.category_displays[col].category_text = category.title
-                self.category_displays[col].category_explanation = category.explanation
+                self.category_displays[col].text_A = category.title
+                self.category_displays[col].text_B = category.explanation
                 # the following line is temporary. Later it should display a "Jeopardy" or "Double Jeopardy" card
                 #  covering the category unless the game is being edited then the category name should show
                 # this means the games should be opened in ProgramMode.Neutral and it calls for another
                 # DisplayState
-                self.category_displays[col].display_state = DisplayState.Category
+                self.category_displays[col].setDisplayState(DisplayState.A_Text)
                 row = 0
                 for item in category.items:
                     if segment == Segment.Jeopardy:
                         self.clue_displays[col][row].amount = self.base_amount + self.base_amount * row
                     elif segment == Segment.DoubleJeopardy:
                         self.clue_displays[col][row].amount = 2 * self.base_amount + 2 * self.base_amount * row
-                    self.clue_displays[col][row].clue = item.clue
-                    self.clue_displays[col][row].correct_response = item.response
-                    self.clue_displays[col][row].display_state = DisplayState.Dollars
+                    self.clue_displays[col][row].text_A = item.clue
+                    self.clue_displays[col][row].text_B = item.response
+                    self.clue_displays[col][row].setDisplayState(DisplayState.Dollars)
                     row += 1
                 col += 1
         else:

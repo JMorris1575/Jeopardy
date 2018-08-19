@@ -7,22 +7,26 @@ from constants import *
 
 class DisplayUnit(QGraphicsItem):
 
-    def __init__(self, size, controller, font=QFont("Arial", 18), color=QColor(Qt.white), text="", parent=None):
+    def __init__(self, size, type, controller, parent=None):
         super(DisplayUnit, self).__init__(parent)
         self.size = size
+        self.type = type                # either DisplayType.Category or DisplayType.Clue
         self.controller = controller
 
-        self.font = font
-        self.color = color
-
-        self.text = text
-        self._shadow_text = QGraphicsTextItem(self.text, self)
+        self.displayed_text = ""    # the text that will be displayed
+        self.text_A = ""            # text_A is the main thing to display: category name or clue
+        self.text_B = ""            # text_B is the secondary thing to display: category explanation or correct response
+        self._shadow_text = QGraphicsTextItem(self.displayed_text, self)
         self._shadow_text.setDefaultTextColor(QColor(Qt.black))
-        self._text_item = QGraphicsTextItem(self.text, self)
-        self._text_item.setDefaultTextColor(QColor(self.color))
+        self._text_item = QGraphicsTextItem(self.displayed_text, self)      # color to be set in displayText()
+        # self._text_item.setDefaultTextColor(QColor(self.color))
+
+        if self.type == DisplayType.Category:
+            self.font = self.controller.category_font
+            self._text_item.setDefaultTextColor(QColor(Qt.white))
 
         #:todo: figure out how to handle the following three things in this new approach
-        # self.display_state = DisplayState.Blank
+        self.display_state = DisplayState.Blank
         # self.hide_category = False
         # self.category_cover = QPixmap('../images/jeopardy.png')
 
@@ -52,6 +56,40 @@ class DisplayUnit(QGraphicsItem):
 
     # Here is where my own methods start
 
+    def setDisplayState(self, state):
+        """
+        Sets the display state of the unit by setting its font and color
+        :param state: the DisplayState of the unit
+        :return: None
+        """
+        # first set the new display_state
+        self.display_state = state
+
+        # now deal with the fonts and colors of the clue units
+        if self.type == DisplayType.Clue:
+            if self.display_state == DisplayState.Dollars or self.display_state == DisplayState.Points:
+                self._text_item.setDefaultTextColor(QColor(Qt.yellow))
+                self.font = self.controller.number_font
+            else:
+                self._text_item.setDefaultTextColor(QColor(Qt.white))
+                self.font = self.controller.clue_font
+
+        # finally deal with what should be displayed
+        if self.display_state == DisplayState.Blank:
+            self.displayed_text = ''
+        elif self.display_state == DisplayState.Waiting:
+            self.displayed_text = '?'
+        elif self.display_state == DisplayState.A_Text:
+            self.displayed_text = self.text_A
+        elif self.display_state == DisplayState.B_Text:
+            self.displayed_text = self.text_B
+        elif self.display_state == DisplayState.Dollars:
+            self.displayed_text = '$' + str(self.amount)
+        elif self.display_state == DisplayState.Points:
+            self.displayed_text = str(self.amount)
+        else:
+            print("A DisplayState was entered that does not exist. (This should be an exception.)")
+
     def formatText(self):
         """
         Adjusts self._text_item and self._shadow_text to display as a shadowed font.
@@ -59,13 +97,13 @@ class DisplayUnit(QGraphicsItem):
         """
         self.font.setCapitalization(QFont.AllUppercase)
         font_metrics = QFontMetrics(self.font)
-        self._shadow_text.setPlainText(self.text)
+        self._shadow_text.setPlainText(self.displayed_text)
         self._shadow_text.setFont(self.font)
         self._shadow_text = self.centerText(self._shadow_text,)
         shadow_offset = font_metrics.capHeight() * 0.07
         self._shadow_text.moveBy(shadow_offset, shadow_offset)
 
-        self._text_item.setPlainText(self.text)
+        self._text_item.setPlainText(self.displayed_text)
         self._text_item.setFont(self.font)
         self._text_item = self.centerText(self._text_item)                # foreground is not offset
 
@@ -95,32 +133,7 @@ class DisplayUnit(QGraphicsItem):
 
         return graphics_text_item
 
-    # def displayText(self):
-    #     """
-    #     Prepares to set text in the DisplayUnit according to self.display_state
-    #     :return: None
-    #     """
-    #     self._foreground_text.setDefaultTextColor(QColor(Qt.white))
-    #
-    #     if self.display_state == DisplayState.Blank:
-    #         self.formatText('', self.clue_font)                             # clear the text from the unit
-    #     elif self.display_state == DisplayState.Waiting:
-    #         self.formatText('?', self.number_font)
-    #     elif self.display_state == DisplayState.Category:
-    #         self.formatText(self.category_text, self.category_font)
-    #     elif self.display_state == DisplayState.Explanation:
-    #         self.formatText(self.category_explanation, self.category_font)
-    #     elif self.display_state == DisplayState.Clue:
-    #         self.formatText(self.clue, self.clue_font)
-    #     elif self.display_state == DisplayState.Response:
-    #         self.formatText(self.correct_response, self.clue_font)
-    #     elif self.display_state == DisplayState.Dollars:
-    #         self._foreground_text.setDefaultTextColor(QColor(Qt.yellow))
-    #         self.formatText('$' + str(self.amount), self.number_font)
-    #     elif self.display_state == DisplayState.Points:
-    #         self.formatText(str(self.amount), self.number_font)
-    #     else:
-    #         print("A DisplayState was entered that does not exist. (This should be an exception.)")
+
 
     # def formatText(self, text, font):
     #     """
@@ -162,7 +175,7 @@ class DisplayUnit(QGraphicsItem):
     def mouseDoubleClickEvent(self, event):
         print("Got to mousePressEvent in DisplayUnit with event: ", event)
         print("Mouse event.button() = ", event.button())
-        self.text = "Testing"
+        self.displayed_text = "Testing"
 
 # class DisplayUnitBak(QGraphicsItem):
 #

@@ -18,13 +18,11 @@ class DisplayType(Enum):
 class DisplayState(Enum):
     Blank = 1
     Waiting = 2
-    Category = 3
-    Explanation = 4
-    Clue = 5
-    Response = 6
-    Dollars = 7
-    Points = 8
-    Emblem = 9
+    A_Text = 3
+    B_Text = 4
+    Dollars = 5
+    Points = 6
+    Emblem = 7
 
 
 
