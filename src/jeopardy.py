@@ -212,7 +212,7 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
 
     def fillBoard(self, game, segment):
         """
-        Fills all of the Category and Clue units
+        Fills all of the Category and Clue units -- currently also sets the display state better set elsewhere
         :param game: an instance of the Game class
         :param segment: a member of the Segment class: Segment.Jeopardy, Segment.DoubleJeopardy or Segment.FinalJeopardy
         :return: None
@@ -242,6 +242,37 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
         else:
             # fill the board for game.final_jeopardy[]
             pass
+
+    def mousePressProcessing(self, unit, button):
+        """
+        Processes mouse events received from the DisplayUnits
+        :param unit: the display unit that received the mouse press
+        :param button: which button was pressed: Qt.LeftButton, Qt.RightButton or Qt.MiddleButton
+        :return: None
+        """
+        print("Got to mousePressProcessing() in jeopardy.py")
+        if self.program_mode == ProgramMode.Editing:
+            self.editGame(unit)
+        elif self.program_mode == ProgramMode.Playing:
+            unit.displayed_text = "Ready to reveal a clue."
+        elif self.program_mode == ProgramMode.Neutral:
+            unit.displayed_text = "Shift to Edit mode"
+        elif self.program_mode == ProgramMode.Empty:
+            unit.displayed_text = "Please load or create a game."
+        else:
+            unit.displayed_text = "Unknown program_mode in mousePressProcessing"
+
+    def editGame(self, unit):
+        """
+        Allows the user to edit the contents of the Game() element displayed by the current unit
+        :param unit: The DisplayUnit that was clicked
+        :return: None
+        """
+        unit.setDisplayState(DisplayState.A_Text)
+        unit._text_item.setTextInteractionFlags(Qt.TextEditorInteraction)
+
+
+
 
 
 if __name__ == "__main__":

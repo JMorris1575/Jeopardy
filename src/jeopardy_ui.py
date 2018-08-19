@@ -160,30 +160,47 @@ class JeopardyUI(object):
                     return
         self.game = self.game.read_game('temp_saved_game')
         self.game.playable = True
-        print("The game is marked playable = ", self.game.playable)
-        self.game_loaded = True
+        print("The phony game has been marked playable = ", self.game.playable)
         self.setProgramMode(ProgramMode.Neutral)
         self.hideCategories(self.game_segment)
         self.fillBoard(self.game, Segment.Jeopardy)
 
     def file_create(self):
         print("Got to file_create.")
-        self.game_loaded = True
         # Check to see if the file in memory needs saving
         if self.game_modified:
             result = self.checkForSave()
             if result == QMessageBox.Cancel:
                 return
         print("Creating a new game.")
-        self.game = Game()
         self.setProgramMode(ProgramMode.Editing)
+        # build the empty game
+        self.game = Game("<name>", "<topic>", "<target group>")
+        for segment in Segment:
+            if segment.name != 'FinalJeopardy':
+                for i in range(6):
+                    category = Category("click to edit", "?")
+                    for j in range(5):
+                        item = Item(segment.name + ' clue', 'empty response')
+                        category.add_item(item)
+                    self.game.add_category(segment, category)
+            else:
+                category = Category('Final Jeopardy Category', 'Final Jeopardy Category Explanation')
+                item = Item('Final Jeopardy Clue', 'Final Jeopardy Response')
+                category.add_item(item)
+                self.game.add_category(segment, category)
+        # set the clue displays to DisplayState.Text_A
+        for col in range(6):
+            for row in range(5):
+                self.clue_displays[col][row].setDisplayState(DisplayState.A_Text)
+        # display the newly created game on the screen
+        self.fillBoard(self.game, Segment.Jeopardy)
 
     def file_close(self):
         print("Got to file_close.")
         # check for unsaved changes here
         self.game = Game()                      # clear out all the former game entries
-        self.game_loaded = False
-        self.setProgramMode(ProgramMode.Neutral)
+        self.setProgramMode(ProgramMode.Empty)
 
     def file_save(self):
         print("Got to file_save.")
