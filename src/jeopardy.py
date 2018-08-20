@@ -3,6 +3,8 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
 from constants import *
+from dialogs import *
+
 import jeopardy_ui
 from models import *
 from graphic_objects import *
@@ -252,7 +254,7 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
         """
         print("Got to mousePressProcessing() in jeopardy.py")
         if self.program_mode == ProgramMode.Editing:
-            self.editGame(unit)
+            self.editGameElement(unit)
         elif self.program_mode == ProgramMode.Playing:
             unit.displayed_text = "Ready to reveal a clue."
         elif self.program_mode == ProgramMode.Neutral:
@@ -262,17 +264,19 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
         else:
             unit.displayed_text = "Unknown program_mode in mousePressProcessing"
 
-    def editGame(self, unit):
+    def editGameElement(self, unit):
         """
         Allows the user to edit the contents of the Game() element displayed by the current unit
         :param unit: The DisplayUnit that was clicked
         :return: None
         """
-        unit.setDisplayState(DisplayState.A_Text)
-        unit._text_item.setTextInteractionFlags(Qt.TextEditorInteraction)
-
-
-
+        # unit.setDisplayState(DisplayState.A_Text)
+        # unit._text_item.setTextInteractionFlags(Qt.TextEditorInteraction)
+        edit_dialog = ElementEditDialog(unit.type, unit.text_A, unit.text_B)
+        if edit_dialog.exec():
+            print("Edit was accepted with text_A = ", edit_dialog.text_A)
+        else:
+            print("Edit was rejected.")
 
 
 if __name__ == "__main__":
