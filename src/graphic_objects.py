@@ -7,11 +7,13 @@ from constants import *
 
 class DisplayUnit(QGraphicsItem):
 
-    def __init__(self, size, type, controller, parent=None):
+    def __init__(self, size, type, controller, col, row=None, parent=None):
         super(DisplayUnit, self).__init__(parent)
         self.size = size
         self.type = type                # either DisplayType.Category or DisplayType.Clue
         self.controller = controller
+        self.col = col
+        self.row = row
 
         self.displayed_text = ""    # the text that will be displayed
         self.text_A = ""            # text_A is the main thing to display: category name or clue

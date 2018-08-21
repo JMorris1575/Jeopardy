@@ -27,11 +27,11 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
         self.setProgramMode(ProgramMode.Empty)
         self.game_segment = Segment.Jeopardy
 
-        self.category_font = QFont("Arial", 18)
+        self.category_font = QFont("Arial", 16)
         self.font_database = QFontDatabase()
         self.clue_font_id = self.font_database.addApplicationFont("../fonts/GenBkBasBI.ttf")
         if self.clue_font_id != -1:
-            self.clue_font = QFont("Gentium Book Basic", 18)
+            self.clue_font = QFont("Gentium Book Basic", 12)
         else:
             self.clue_font = QFont("Times New Roman", 18)
         self.number_font = QFont("Arial", 32, QFont.Bold)
@@ -162,7 +162,7 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
         # Create the category displays
         self.category_displays = []
         for col in range(6):
-            element = DisplayUnit(display_unit_size, DisplayType.Category, self)
+            element = DisplayUnit(display_unit_size, DisplayType.Category, self, col)
             element.setPos(col * (display_unit_size.width() + gap), 0)
             element.setDisplayState(DisplayState.Blank)
             self.category_displays.append(element)
@@ -173,7 +173,7 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
         for col in range(6):
             row_list = []
             for row in range(5):
-                element = DisplayUnit(display_unit_size, DisplayType.Clue, self)
+                element = DisplayUnit(display_unit_size, DisplayType.Clue, self, col, row)
                 element.setPos(col * (display_unit_size.width() + gap),
                                display_unit_size.height() + 2 * gap + row * (display_unit_size.height() + gap))
                 element.setDisplayState(DisplayState.Blank)
@@ -212,6 +212,39 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
         """
         self.category_displays[number].hide_category = False
 
+    def createGame(self):
+        """
+        Called from File->Create... to create a new game
+        :return: None
+        """
+        # Check to see if the file in memory needs saving
+        if self.game_modified:
+            result = self.checkForSave()
+            if result == QMessageBox.Cancel:
+                return
+        self.setProgramMode(ProgramMode.Editing)
+        # build the empty game
+        self.game = Game("<name>", "<topic>", "<target group>")
+        for segment in Segment:
+            if segment.name != 'FinalJeopardy':
+                for i in range(6):
+                    category = Category("", "")
+                    for j in range(5):
+                        item = Item('', '')
+                        category.add_item(item)
+                    self.game.add_category(segment, category)
+            else:
+                category = Category('Final Jeopardy Category', 'Final Jeopardy Category Explanation')
+                item = Item('Final Jeopardy Clue', 'Final Jeopardy Response')
+                category.add_item(item)
+                self.game.add_category(segment, category)
+        # set the clue displays to DisplayState.Text_A
+        for col in range(6):
+            for row in range(5):
+                self.clue_displays[col][row].setDisplayState(DisplayState.A_Text)
+        # display the newly created game on the screen
+        self.fillBoard(self.game, Segment.Jeopardy)
+
     def fillBoard(self, game, segment):
         """
         Fills all of the Category and Clue units -- currently also sets the display state better set elsewhere
@@ -229,7 +262,7 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
                 #  covering the category unless the game is being edited then the category name should show
                 # this means the games should be opened in ProgramMode.Neutral and it calls for another
                 # DisplayState
-                self.category_displays[col].setDisplayState(DisplayState.A_Text)
+                # self.category_displays[col].setDisplayState(DisplayState.A_Text)
                 row = 0
                 for item in category.items:
                     if segment == Segment.Jeopardy:
@@ -238,7 +271,7 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
                         self.clue_displays[col][row].amount = 2 * self.base_amount + 2 * self.base_amount * row
                     self.clue_displays[col][row].text_A = item.clue
                     self.clue_displays[col][row].text_B = item.response
-                    self.clue_displays[col][row].setDisplayState(DisplayState.Dollars)
+                    # self.clue_displays[col][row].setDisplayState(DisplayState.Dollars)
                     row += 1
                 col += 1
         else:
@@ -252,7 +285,6 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
         :param button: which button was pressed: Qt.LeftButton, Qt.RightButton or Qt.MiddleButton
         :return: None
         """
-        print("Got to mousePressProcessing() in jeopardy.py")
         if self.program_mode == ProgramMode.Editing:
             self.editGameElement(unit)
         elif self.program_mode == ProgramMode.Playing:
@@ -274,9 +306,36 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
         # unit._text_item.setTextInteractionFlags(Qt.TextEditorInteraction)
         edit_dialog = ElementEditDialog(unit.type, unit.text_A, unit.text_B)
         if edit_dialog.exec():
-            print("Edit was accepted with text_A = ", edit_dialog.text_A)
-        else:
-            print("Edit was rejected.")
+            text_A = edit_dialog.line_edit_A.text()
+            text_B = edit_dialog.line_edit_B.text()
+            unit.text_A = text_A
+            unit.text_B = text_B
+            if unit.type == DisplayType.Category:
+                if self.game_segment == Segment.Jeopardy:
+                    self.game.jeopardy[unit.col].title = text_A
+                    self.game.jeopardy[unit.col].explanation = text_B
+                elif self.game_segment == Segment.DoubleJeopardy:
+                    self.game.double_jeopardy[unit.col].title = text_A
+                    self.game.double_jeopardy[unit.col].explanation = text_B
+                else:
+                    self.game.final_jeopardy[unit.col].title = text_A
+                    self.game.final_jeopardy[unit.col].explanation = text_B
+            else:
+                if self.game_segment == Segment.Jeopardy:
+                    self.game.jeopardy[unit.col].items[unit.row].clue = text_A
+                    self.game.jeopardy[unit.col].items[unit.row].response = text_B
+                elif self.game_segment == Segment.DoubleJeopardy:
+                    self.game.double_jeopardy[unit.col].items[unit.row].clue = text_A
+                    self.game.double_jeopardy[unit.col].items[unit.row].response = text_B
+                else:
+                    self.game.final_jeopardy[unit.col].items[unit.row].clue = text_A
+                    self.game.final_jeopardy[unit.col].items[unit.row].response = text_B
+            unit.setDisplayState(DisplayState.A_Text)
+
+            # you need to re-think how to get information from the Game() class to the DisplayUnits
+            # it would be nice to have a fillUnit() method that takes the information from the edit_dialog box
+            # and
+            self.game_modified = True
 
 
 if __name__ == "__main__":

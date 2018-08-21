@@ -167,34 +167,7 @@ class JeopardyUI(object):
 
     def file_create(self):
         print("Got to file_create.")
-        # Check to see if the file in memory needs saving
-        if self.game_modified:
-            result = self.checkForSave()
-            if result == QMessageBox.Cancel:
-                return
-        print("Creating a new game.")
-        self.setProgramMode(ProgramMode.Editing)
-        # build the empty game
-        self.game = Game("<name>", "<topic>", "<target group>")
-        for segment in Segment:
-            if segment.name != 'FinalJeopardy':
-                for i in range(6):
-                    category = Category("click to edit", "?")
-                    for j in range(5):
-                        item = Item(segment.name + ' clue', 'empty response')
-                        category.add_item(item)
-                    self.game.add_category(segment, category)
-            else:
-                category = Category('Final Jeopardy Category', 'Final Jeopardy Category Explanation')
-                item = Item('Final Jeopardy Clue', 'Final Jeopardy Response')
-                category.add_item(item)
-                self.game.add_category(segment, category)
-        # set the clue displays to DisplayState.Text_A
-        for col in range(6):
-            for row in range(5):
-                self.clue_displays[col][row].setDisplayState(DisplayState.A_Text)
-        # display the newly created game on the screen
-        self.fillBoard(self.game, Segment.Jeopardy)
+        self.createGame()
 
     def file_close(self):
         print("Got to file_close.")
