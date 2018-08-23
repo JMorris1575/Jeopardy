@@ -35,9 +35,13 @@ class DisplayUnit(QGraphicsItem):
             self._text_item.setDefaultTextColor(QColor(Qt.white))
 
         #:todo: figure out how to handle the following three things in this new approach
-        self.setDisplayState(DisplayState.Blank)
+        # self.setDisplayState(DisplayState.Blank)
         # self.hide_category = False
         # self.category_cover = QPixmap('../images/jeopardy.png')
+        self.jeopardy_cover = QPixmap('../images/JeopardyCard.png')
+        self.double_jeopardy_cover = QPixmap('../images/DoubleJeopardyCard.png')
+        self.final_jeopardy_cover = QPixmap('../images/FinalJeopardyCard.png')
+        self.cover_card = self.jeopardy_cover
 
     # The following two methods are mandatory when subclassing QGraphicsItem
 
@@ -58,7 +62,10 @@ class DisplayUnit(QGraphicsItem):
 
     def paint(self, painter, option, widget):
         target = QRectF(self.boundingRect())
-        pixmap = QPixmap('../images/blue_screen.png')
+        if self.display_state == DisplayState.SegmentCard or self.display_state == DisplayState.DailyDouble:
+            pixmap = self.cover_card
+        else:
+            pixmap = QPixmap('../images/blue_screen.png')
         source = QRectF(pixmap.rect())
         painter.drawPixmap(target, pixmap, source)
         self.formatText()
@@ -69,9 +76,18 @@ class DisplayUnit(QGraphicsItem):
         self.contents[segment.name]['A'] = text_A
         self.contents[segment.name]['B'] = text_B
 
+    def setCoverCard(self, segment):
+        if segment == Segment.Jeopardy:
+            self.cover_card = self.jeopardy_cover
+        elif segment == Segment.DoubleJeopardy:
+            self.cover_card = self.double_jeopardy_cover
+        else:
+            self.cover_card = self.final_jeopardy_cover
+
     def setDisplayState(self, state):
         """
-        Sets the display state of the unit by setting its font and color
+        Sets the display state for the text of the unit by setting its font and color
+        se;f.displayed_text is blanked for DisplayState.SegmentCard and DisplayState.DailyDouble
         :param state: the DisplayState of the unit
         :return: None
         """
@@ -100,8 +116,12 @@ class DisplayUnit(QGraphicsItem):
             self.displayed_text = '$' + str(self.contents[self.controller.game_segment.name]["amount"])
         elif self.display_state == DisplayState.Points:
             self.displayed_text = str(self.contents[self.controller.game_segment.name]["amount"])
+        elif self.display_state == DisplayState.SegmentCard:
+            self.displayed_text = ''
+        elif self.display_state == DisplayState.DailyDouble:
+            self.displayed_text = ''
         else:
-            print("A DisplayState was entered that does not exist. (This should be an exception.)")
+            print("Non-existent DisplayState in graphic_objects.py setDisplayState()")
 
     def formatText(self):
         """

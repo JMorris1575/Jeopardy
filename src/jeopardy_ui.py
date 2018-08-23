@@ -204,19 +204,16 @@ class JeopardyUI(object):
         print("Got to edit_modify_jeopardy.")
         self.setProgramMode(ProgramMode.Editing)
         self.setSegment(Segment.Jeopardy)
-        self.revealCategories()
 
     def edit_modify_double_jeopardy(self):
         print("Got to edit_modify_double_jeopardy.")
         self.setProgramMode(ProgramMode.Editing)
         self.setSegment(Segment.DoubleJeopardy)
-        self.revealCategories()
 
     def edit_modify_final_jeopardy(self):
         print("Got to edit_modify_final_jeopardy.")
         self.setProgramMode(ProgramMode.Editing)
         self.setSegment(Segment.FinalJeopardy)
-        self.revealCategories()
 
     def edit_exit_editing(self):
         print("Got to edit_exit_editing.")

@@ -22,7 +22,8 @@ class DisplayState(Enum):
     B_Text = 4
     Dollars = 5
     Points = 6
-    Emblem = 7
+    SegmentCard = 7
+    DailyDouble = 8
 
 
 

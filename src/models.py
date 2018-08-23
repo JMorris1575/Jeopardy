@@ -26,6 +26,18 @@ class Cell():
     def getTextB(self, segment):
         return self.text_B[segment.name]
 
+    def isFilled(self, segment):
+        text_A = ''
+        text_B = ''
+        if segment.name in self.text_A.keys():
+            text_A = self.text_A[segment.name]
+        if segment.name in self.text_B.keys():
+            text_B = self.text_B[segment.name]
+        if self.type == "Category":
+            return text_A != ''
+        else:
+            return text_A + text_B != ''
+
 
 class Game():
 
@@ -66,10 +78,7 @@ class Game():
         for col in range(6):
             for row in range(6):
                 for segment in Segment:
-                    try:
-                        test = self.board[col][row].getTextA(segment)
-                    except KeyError:
-                        playable = False
+                    if not self.board[col][row].isFilled(segment):
                         return False
         return True
 
