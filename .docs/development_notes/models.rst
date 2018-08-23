@@ -73,7 +73,7 @@ I made some changes in the models as I was putting them together. These changes 
 
 The writing and reading of files was easy enough - the pickle module does all the work. My only difficulty was to
 figure out how the ``read_game()`` method of the ``Game()`` class could read the information from the file and put it
-into itself. It turned out that the operative line IN the method was:
+into itself. It turned out that the operative line in the method was:
 
 ``self = pickle.load(pathname)``
 
@@ -104,3 +104,33 @@ tentative plan:
 #. Get the Save and Save As... menu items working
 #. Too tired to think of the rest of it at the moment...
 
+Redesigning the Game Model
+==========================
+
+After working on the program for some time I realized that to structure the models around the three segments of the
+game: Jeopardy, Double Jeopardy and Final Jeopardy, made for some complicated programming when transferring the contents
+of the game to the DisplayUnits I'm using to show the game. Perhaps it will be easier to structure the game around
+Cells that will contain its contents and later be used to transfer information back and forth from the Game class and
+the DisplayUnits.
+
+Here is a new possibility:
+
+.. csv-table:: **The Revised Game Class**
+    :header: Field, contents, comments
+    :widths: 20, 20, 40
+
+    name, string, optional-to give the game a name
+    topic, string, optional-to give the game a category
+    target-group, string, description of the group anticipated to play the game
+    playable, boolean, true if the game is finished and ready for play
+    cells, list of lists, a 6 x 6 grid of cells that make up all three segments of the game
+
+|
+
+.. csv-table:: **The Cell Class**
+    :header: Field, Contents, Comments
+    :widths: 20, 20, 40
+
+    type, string, either "Category" or "Clue" indicating what kind of cell it is
+    text_A, dictionary, keyed by "Jeopardy"; "DoubleJeopardy" and "FinalJeopardy" containing the category title or clue
+    text_B, dictionary, keyed as above containing the category explanation or correct response

@@ -27,7 +27,7 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
         self.setProgramMode(ProgramMode.Empty)
         self.game_segment = Segment.Jeopardy
 
-        #self.category_font = QFont("Arial", 16)
+        # define the fonts to be used for the various types of display
         self.font_database = QFontDatabase()
         self.category_font_id = self.font_database.addApplicationFont("../fonts/Oswald-Bold.ttf")
         if self.category_font_id != -1:
@@ -169,7 +169,7 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
         # Create the category displays
         self.category_displays = []
         for col in range(6):
-            element = DisplayUnit(display_unit_size, DisplayType.Category, self, col)
+            element = DisplayUnit(display_unit_size, DisplayType.Category, self, col, 0)
             element.setPos(col * (display_unit_size.width() + gap), 0)
             element.setDisplayState(DisplayState.Blank)
             self.category_displays.append(element)
@@ -229,61 +229,100 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
             result = self.checkForSave()
             if result == QMessageBox.Cancel:
                 return
+        self.clearDisplays()
         self.setProgramMode(ProgramMode.Editing)
         # build the empty game
         self.game = Game("<name>", "<topic>", "<target group>")
-        for segment in Segment:
-            if segment.name != 'FinalJeopardy':
-                for i in range(6):
-                    category = Category("", "")
-                    for j in range(5):
-                        item = Item('', '')
-                        category.add_item(item)
-                    self.game.add_category(segment, category)
-            else:
-                category = Category('Final Jeopardy Category', 'Final Jeopardy Category Explanation')
-                item = Item('Final Jeopardy Clue', 'Final Jeopardy Response')
-                category.add_item(item)
-                self.game.add_category(segment, category)
-        # set the clue displays to DisplayState.Text_A
-        for col in range(6):
-            for row in range(5):
-                self.clue_displays[col][row].setDisplayState(DisplayState.A_Text)
-        # display the newly created game on the screen
-        self.fillBoard(self.game, Segment.Jeopardy)
+        # for segment in Segment:
+        #     if segment.name != 'FinalJeopardy':
+        #         for i in range(6):
+        #             category = Category("", "")
+        #             for j in range(5):
+        #                 item = Item('', '')
+        #                 category.add_item(item)
+        #             self.game.add_category(segment, category)
+        #     else:
+        #         category = Category('Final Jeopardy Category', 'Final Jeopardy Category Explanation')
+        #         item = Item('Final Jeopardy Clue', 'Final Jeopardy Response')
+        #         category.add_item(item)
+        #         self.game.add_category(segment, category)
+        # # set the clue displays to DisplayState.Text_A
+        # for col in range(6):
+        #     for row in range(5):
+        #         self.clue_displays[col][row].setDisplayState(DisplayState.A_Text)
+        # # display the newly created game on the screen
+        # # self.fillBoard(self.game, Segment.Jeopardy)
+        # self.fillBoard(self.game)
 
-    def fillBoard(self, game, segment):
+    # def fillBoard(self, game, segment):
+    #     """
+    #     Fills all of the Category and Clue units -- currently also sets the display state better set elsewhere
+    #     :param game: an instance of the Game class
+    #     :param segment: a member of the Segment class: Segment.Jeopardy, Segment.DoubleJeopardy or Segment.FinalJeopardy
+    #     :return: None
+    #     """
+    #     if segment == Segment.Jeopardy or segment == Segment.DoubleJeopardy:
+    #         categories = game.get_categories(segment)
+    #         col = 0
+    #         for category in categories:
+    #             self.category_displays[col].text_A = category.title
+    #             self.category_displays[col].text_B = category.explanation
+    #             # the following line is temporary. Later it should display a "Jeopardy" or "Double Jeopardy" card
+    #             #  covering the category unless the game is being edited then the category name should show
+    #             # this means the games should be opened in ProgramMode.Neutral and it calls for another
+    #             # DisplayState
+    #             # self.category_displays[col].setDisplayState(DisplayState.A_Text)
+    #             row = 0
+    #             for item in category.items:
+    #                 if segment == Segment.Jeopardy:
+    #                     self.clue_displays[col][row].amount = self.base_amount + self.base_amount * row
+    #                 elif segment == Segment.DoubleJeopardy:
+    #                     self.clue_displays[col][row].amount = 2 * self.base_amount + 2 * self.base_amount * row
+    #                 self.clue_displays[col][row].text_A = item.clue
+    #                 self.clue_displays[col][row].text_B = item.response
+    #                 # self.clue_displays[col][row].setDisplayState(DisplayState.Dollars)
+    #                 row += 1
+    #             col += 1
+    #     else:
+    #         # fill the board for game.final_jeopardy[]
+    #         pass
+
+    def clearDisplays(self):
         """
-        Fills all of the Category and Clue units -- currently also sets the display state better set elsewhere
-        :param game: an instance of the Game class
-        :param segment: a member of the Segment class: Segment.Jeopardy, Segment.DoubleJeopardy or Segment.FinalJeopardy
+        Clears all of the displays on the board by setting each unit's DisplayState to DisplayState.Blank
         :return: None
         """
-        if segment == Segment.Jeopardy or segment == Segment.DoubleJeopardy:
-            categories = game.get_categories(segment)
-            col = 0
-            for category in categories:
-                self.category_displays[col].text_A = category.title
-                self.category_displays[col].text_B = category.explanation
-                # the following line is temporary. Later it should display a "Jeopardy" or "Double Jeopardy" card
-                #  covering the category unless the game is being edited then the category name should show
-                # this means the games should be opened in ProgramMode.Neutral and it calls for another
-                # DisplayState
-                # self.category_displays[col].setDisplayState(DisplayState.A_Text)
-                row = 0
-                for item in category.items:
-                    if segment == Segment.Jeopardy:
-                        self.clue_displays[col][row].amount = self.base_amount + self.base_amount * row
-                    elif segment == Segment.DoubleJeopardy:
-                        self.clue_displays[col][row].amount = 2 * self.base_amount + 2 * self.base_amount * row
-                    self.clue_displays[col][row].text_A = item.clue
-                    self.clue_displays[col][row].text_B = item.response
-                    # self.clue_displays[col][row].setDisplayState(DisplayState.Dollars)
-                    row += 1
-                col += 1
-        else:
-            # fill the board for game.final_jeopardy[]
-            pass
+        for col in range(6):
+            self.category_displays[col].setDisplayState(DisplayState.Blank)
+            for row in range(5):
+                self.clue_displays[col][row].setDisplayState(DisplayState.Blank)
+
+    def fillBoard(self, game):
+        """
+        Fills all of the Category and Clue units with the text contents of every segment of the game
+        :param game: and instance of the Game() class from which the information is drawn
+        :return: None
+        """
+        for segment in Segment:
+            if segment == Segment.FinalJeopardy:
+                pass
+            else:
+                col = 0
+                categories = game.get_categories(segment)
+                for category in categories:
+                    self.category_displays[col].contents[segment.name]['A'] = category.title
+                    self.category_displays[col].contents[segment.name]['B'] = category.explanation
+                    row = 0
+                    for item in category.items:
+                        self.clue_displays[col][row].contents[segment.name]['A'] = item.clue
+                        self.clue_displays[col][row].contents[segment.name]['B'] = item.response
+                        if segment == Segment.Jeopardy:
+                            self.clue_displays[col][row].contents[segment.name]['amount'] = \
+                                self.base_amount + self.base_amount * row
+                        elif segment == Segment.DoubleJeopardy:
+                            self.clue_displays[col][row].contents[segment.name]['amount'] = \
+                                2 * self.base_amount + 2 * self.base_amount * row
+
 
     def mousePressProcessing(self, unit, button):
         """
@@ -315,28 +354,30 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
         if edit_dialog.exec():
             text_A = edit_dialog.line_edit_A.text()
             text_B = edit_dialog.line_edit_B.text()
-            unit.text_A = text_A
-            unit.text_B = text_B
-            if unit.type == DisplayType.Category:
-                if self.game_segment == Segment.Jeopardy:
-                    self.game.jeopardy[unit.col].title = text_A
-                    self.game.jeopardy[unit.col].explanation = text_B
-                elif self.game_segment == Segment.DoubleJeopardy:
-                    self.game.double_jeopardy[unit.col].title = text_A
-                    self.game.double_jeopardy[unit.col].explanation = text_B
-                else:
-                    self.game.final_jeopardy[unit.col].title = text_A
-                    self.game.final_jeopardy[unit.col].explanation = text_B
-            else:
-                if self.game_segment == Segment.Jeopardy:
-                    self.game.jeopardy[unit.col].items[unit.row].clue = text_A
-                    self.game.jeopardy[unit.col].items[unit.row].response = text_B
-                elif self.game_segment == Segment.DoubleJeopardy:
-                    self.game.double_jeopardy[unit.col].items[unit.row].clue = text_A
-                    self.game.double_jeopardy[unit.col].items[unit.row].response = text_B
-                else:
-                    self.game.final_jeopardy[unit.col].items[unit.row].clue = text_A
-                    self.game.final_jeopardy[unit.col].items[unit.row].response = text_B
+            unit.setContents(self.game_segment, text_A, text_B)
+            self.game.board[unit.col][unit.row].setContents(self.game_segment, text_A, text_B)
+            if self.game.isPlayable():
+                self.game.playable = True
+            # if unit.type == DisplayType.Category:
+            #     if self.game_segment == Segment.Jeopardy:
+            #         self.game.jeopardy[unit.col].title = text_A
+            #         self.game.jeopardy[unit.col].explanation = text_B
+            #     elif self.game_segment == Segment.DoubleJeopardy:
+            #         self.game.double_jeopardy[unit.col].title = text_A
+            #         self.game.double_jeopardy[unit.col].explanation = text_B
+            #     else:
+            #         self.game.final_jeopardy[unit.col].title = text_A
+            #         self.game.final_jeopardy[unit.col].explanation = text_B
+            # else:
+            #     if self.game_segment == Segment.Jeopardy:
+            #         self.game.jeopardy[unit.col].items[unit.row].clue = text_A
+            #         self.game.jeopardy[unit.col].items[unit.row].response = text_B
+            #     elif self.game_segment == Segment.DoubleJeopardy:
+            #         self.game.double_jeopardy[unit.col].items[unit.row].clue = text_A
+            #         self.game.double_jeopardy[unit.col].items[unit.row].response = text_B
+            #     else:
+            #         self.game.final_jeopardy[unit.col].items[unit.row].clue = text_A
+            #         self.game.final_jeopardy[unit.col].items[unit.row].response = text_B
             unit.setDisplayState(DisplayState.A_Text)
 
             # you need to re-think how to get information from the Game() class to the DisplayUnits

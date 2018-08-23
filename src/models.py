@@ -4,28 +4,27 @@ import pickle
 import os
 import sys
 
-class Item():
+class Cell():
 
-    def __init__(self, clue='', response=''):
-        self.clue = clue
-        self.response = response
-
-    def __str__(self):
-        return "    Clue: " + self.clue + "\nResponse: " + self.response
-
-
-class Category():
-
-    def __init__(self, title='', explanation=''):
-        self.title = title
-        self.explanation = explanation
-        self.items = []     # will hold the clue/response item(s) for this category
+    def __init__(self, type, col, row):
+        self.type = type
+        self.col = col
+        self.row = row
+        self.text_A = {}
+        self.text_B = {}
 
     def __str__(self):
-        return self.title + ': ' + str(len(self.items)) + ' items.'
+        return self.type + " cell at (" + str(self.col) + ', ' + str(self.row) + ')'
 
-    def add_item(self, item):
-        self.items.append(item)
+    def setContents(self, segment, text_A, text_B):
+        self.text_A[segment.name] = text_A
+        self.text_B[segment.name] = text_B
+
+    def getTextA(self, segment):
+        return self.text_A[segment.name]
+
+    def getTextB(self, segment):
+        return self.text_B[segment.name]
 
 
 class Game():
@@ -35,9 +34,11 @@ class Game():
         self.topic = topic
         self.target_group = target_group
         self.playable = playable
-        self.jeopardy = []
-        self.double_jeopardy = []
-        self.final_jeopardy = []
+        self.board = []                         # the container for all the rows and columns
+        for col in range(6):
+            self.board.append([Cell("Category", col, 0)])               # the container for each column
+            for row in range(5):
+                self.board[col].append(Cell("Clue", col, row+1))      # the container for each cell in the column
 
     def __str__(self):
         if self.playable:
@@ -50,21 +51,27 @@ class Game():
             msg = 'unnamed Jeopardy game' + appendage
         return msg
 
-    def add_category(self, segment, category):
-        if segment == Segment.Jeopardy:
-            self.jeopardy.append(category)
-        elif segment == Segment.DoubleJeopardy:
-            self.double_jeopardy.append(category)
+    def setCell(self, col, row, cell):
+        self.board[col][row] = cell
+        if self.isPlayable():
+            self.playable = True
         else:
-            self.final_jeopardy.append(category)
+            self.playable = False
 
-    def get_categories(self, segment):
-        if segment == Segment.Jeopardy:
-            return self.jeopardy
-        elif segment == Segment.DoubleJeopardy:
-            return self.double_jeopardy
-        else:
-            return self.final_jeopardy
+    def isPlayable(self):
+        """
+        Checks the playability of the game based on each cell having text_A contents for all segments
+        :return: True if all cells have contents for text_A, False otherwise
+        """
+        for col in range(6):
+            for row in range(6):
+                for segment in Segment:
+                    try:
+                        test = self.board[col][row].getTextA(segment)
+                    except KeyError:
+                        playable = False
+                        return False
+        return True
 
     def write_game(self, pathname):
         """

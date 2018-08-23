@@ -7,7 +7,7 @@ from constants import *
 
 class DisplayUnit(QGraphicsItem):
 
-    def __init__(self, size, type, controller, col, row=None, parent=None):
+    def __init__(self, size, type, controller, col, row, parent=None):
         super(DisplayUnit, self).__init__(parent)
         self.size = size
         self.type = type                # either DisplayType.Category or DisplayType.Clue
@@ -16,6 +16,10 @@ class DisplayUnit(QGraphicsItem):
         self.row = row
 
         self.displayed_text = ""    # the text that will be displayed
+        self.contents = {"Jeopardy":{"A":"", "B":""}, "DoubleJeopardy":{"A":"", "B":""}, "FinalJeopardy":{"A":"", "B":""}}
+        if self.type == DisplayType.Clue:
+            self.contents["Jeopardy"]['amount'] = 0          # amounts will be set later in the program
+            self.contents["DoubleJeopardy"]['amount'] = 0
         self.text_A = ""            # text_A is the main thing to display: category name or clue
         self.text_B = ""            # text_B is the secondary thing to display: category explanation or correct response
         self._shadow_text = QGraphicsTextItem(self.displayed_text, self)
@@ -61,6 +65,10 @@ class DisplayUnit(QGraphicsItem):
 
     # Here is where my own methods start
 
+    def setContents(self, segment, text_A, text_B):
+        self.contents[segment.name]['A'] = text_A
+        self.contents[segment.name]['B'] = text_B
+
     def setDisplayState(self, state):
         """
         Sets the display state of the unit by setting its font and color
@@ -85,13 +93,13 @@ class DisplayUnit(QGraphicsItem):
         elif self.display_state == DisplayState.Waiting:
             self.displayed_text = '?'
         elif self.display_state == DisplayState.A_Text:
-            self.displayed_text = self.text_A
+            self.displayed_text = self.contents[self.controller.game_segment.name]["A"]
         elif self.display_state == DisplayState.B_Text:
-            self.displayed_text = self.text_B
+            self.displayed_text = self.contents[self.controller.game_segment.name]["B"]
         elif self.display_state == DisplayState.Dollars:
-            self.displayed_text = '$' + str(self.amount)
+            self.displayed_text = '$' + str(self.contents[self.controller.game_segment.name]["amount"])
         elif self.display_state == DisplayState.Points:
-            self.displayed_text = str(self.amount)
+            self.displayed_text = str(self.contents[self.controller.game_segment.name]["amount"])
         else:
             print("A DisplayState was entered that does not exist. (This should be an exception.)")
 

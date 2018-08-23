@@ -3,6 +3,12 @@ from models import Item, Category, Game
 
 import random
 
+#####################################################################################################################
+#                                                                                                                   #
+# NOTE: THIS PROGRAM WAS DESIGNED FOR THE ORIGINAL VERSION OF models.py. IT WILL NOT WORK WITH THE CURRENT VERSION. #
+#                                                                                                                   #
+#####################################################################################################################
+
 def print_game(game):
     print("\ngame.name = ", game.name)
     print("game.topic = ", game.topic)
