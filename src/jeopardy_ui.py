@@ -157,12 +157,14 @@ class JeopardyUI(object):
             result = self.checkForSave()
             if result == QMessageBox.Cancel:
                 return
-        self.game = self.game.read_game('../Games/temp_game.jqz')
+        # need a dialog here to select a file
+        self.game_pathname = '../games/temp_game.jqz'
+        self.game = self.game.read_game(self.game_pathname)
         self.game.playable = self.game.isPlayable()
         print("The temporary game has been marked playable = ", self.game.playable)
         self.setProgramMode(ProgramMode.Neutral)
-        self.hideCategories(self.game_segment)
-        self.fillBoard(self.game, Segment.Jeopardy)
+        # self.hideCategories(self.game_segment)
+        # self.fillBoard(self.game, Segment.Jeopardy)
 
     def file_create(self):
         print("Got to file_create.")
@@ -190,7 +192,8 @@ class JeopardyUI(object):
     def file_save_as(self):
         print("Got to file_save_as.")
         # Just for now save the game to Games/temp_game.jqz
-        self.game.write_game('../Games/temp_games.jqz')
+        self.game_pathname = '../Games/temp_game.jqz'
+        self.game.write_game(self.game_pathname)
         self.game_modified = False
 
     def file_print(self):
