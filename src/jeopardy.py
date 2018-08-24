@@ -265,32 +265,28 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
             for row in range(5):
                 self.clue_displays[col][row].setDisplayState(DisplayState.SegmentCard)
 
-    # def fillBoard(self):
-    #     """
-    #     Fills all of the Category and Clue units with the text contents of every segment of the game
-    #     :param game: and instance of the Game() class from which the information is drawn
-    #     :return: None
-    #     """
-    #     for segment in Segment:
-    #         if segment == Segment.FinalJeopardy:
-    #             pass
-    #         else:
-    #             col = 0
-    #             categories = self.game.get_categories(segment)
-    #             for category in categories:
-    #                 self.category_displays[col].contents[segment.name]['A'] = category.title
-    #                 self.category_displays[col].contents[segment.name]['B'] = category.explanation
-    #                 row = 0
-    #                 for item in category.items:
-    #                     self.clue_displays[col][row].contents[segment.name]['A'] = item.clue
-    #                     self.clue_displays[col][row].contents[segment.name]['B'] = item.response
-    #                     if segment == Segment.Jeopardy:
-    #                         self.clue_displays[col][row].contents[segment.name]['amount'] = \
-    #                             self.base_amount + self.base_amount * row
-    #                     elif segment == Segment.DoubleJeopardy:
-    #                         self.clue_displays[col][row].contents[segment.name]['amount'] = \
-    #                             2 * self.base_amount + 2 * self.base_amount * row
-    #
+    def fillBoard(self):
+        """
+        Fills all of the Category and Clue units with the text contents of every segment of the game
+        :param game: and instance of the Game() class from which the information is drawn
+        :return: None
+        """
+        for segment in Segment:
+            if segment == Segment.FinalJeopardy:
+                pass
+            else:
+                for col in range(6):
+                    unit = self.category_displays[col]
+                    unit.setContents(segment, self.game.board[col][0].text_A, self.game.board[col][0].text_B)
+                    for row in range(5):
+                        unit = self.clue_displays[col][row]
+                        unit.setContents(segment, self.game.board[col][row+1].text_A, self.game.board[col][row].text_B)
+                        if segment == Segment.Jeopardy:
+                            self.clue_displays[col][row].contents[segment.name]['amount'] = \
+                                self.base_amount + self.base_amount * row
+                        elif segment == Segment.DoubleJeopardy:
+                            self.clue_displays[col][row].contents[segment.name]['amount'] = \
+                                2 * self.base_amount + 2 * self.base_amount * row
 
     def mousePressProcessing(self, unit, button):
         """

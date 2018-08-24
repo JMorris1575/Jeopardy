@@ -160,9 +160,11 @@ class JeopardyUI(object):
         # need a dialog here to select a file
         self.game_pathname = '../games/temp_game.jqz'
         self.game = self.game.read_game(self.game_pathname)
+        self.fillBoard()
         self.game.playable = self.game.isPlayable()
         print("The temporary game has been marked playable = ", self.game.playable)
         self.setProgramMode(ProgramMode.Neutral)
+
         # self.hideCategories(self.game_segment)
         # self.fillBoard(self.game, Segment.Jeopardy)
 
