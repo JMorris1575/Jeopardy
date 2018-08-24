@@ -41,7 +41,7 @@ class Cell():
 
 class Game():
 
-    def __init__(self, name='', topic='', target_group='', playable=False):
+    def __init__(self, name='', topic='', target_group=[], playable=False):
         self.name = name
         self.topic = topic
         self.target_group = target_group

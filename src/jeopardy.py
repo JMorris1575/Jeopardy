@@ -239,6 +239,22 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
         # build the empty game
         self.game = Game("<name>", "<topic>", "<target group>")
 
+    def getGameInfo(self):
+        """
+        Called from Edit->Modify->Game Info... to get information about the game to be used in the open dialog
+        :return: None
+        """
+        game_info_dialog = GameInfoDialog(self.game.name, self.game.topic, self.game.target_group)
+        if game_info_dialog.exec():
+            self.game.name = game_info_dialog.name
+            self.game.topic = game_info_dialog.topic
+            groups = []
+            for item in game_info_dialog.group:
+                groups.append(item)
+            self.game.target_group = groups
+
+        self.game_modified = True
+
     def coverDisplays(self):
         """
         Covers all of the displays on the board by setting each unit's DisplayState to DisplayState.SegmentCard
@@ -302,10 +318,12 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
         """
         # unit.setDisplayState(DisplayState.A_Text)
         # unit._text_item.setTextInteractionFlags(Qt.TextEditorInteraction)
-        edit_dialog = ElementEditDialog(unit.type, unit.text_A, unit.text_B)
+        text_A = unit.contents[self.game_segment.name]['A']
+        text_B = unit.contents[self.game_segment.name]['B']
+        edit_dialog = ElementEditDialog(unit.type, text_A, text_B)
         if edit_dialog.exec():
-            text_A = edit_dialog.line_edit_A.text()
-            text_B = edit_dialog.line_edit_B.text()
+            text_A = edit_dialog.text_A
+            text_B = edit_dialog.text_B
             unit.setContents(self.game_segment, text_A, text_B)
             self.game.board[unit.col][unit.row].setContents(self.game_segment, text_A, text_B)
             if self.game.isPlayable():

@@ -20,8 +20,8 @@ class DisplayUnit(QGraphicsItem):
         if self.type == DisplayType.Clue:
             self.contents["Jeopardy"]['amount'] = 0          # amounts will be set later in the program
             self.contents["DoubleJeopardy"]['amount'] = 0
-        self.text_A = ""            # text_A is the main thing to display: category name or clue
-        self.text_B = ""            # text_B is the secondary thing to display: category explanation or correct response
+        # self.text_A = ""            # text_A is the main thing to display: category name or clue
+        # self.text_B = ""            # text_B is the secondary thing to display: category explanation or correct response
         self._shadow_text = QGraphicsTextItem(self.displayed_text, self)
         self._shadow_text.setDefaultTextColor(QColor(Qt.black))
         self._text_item = QGraphicsTextItem(self.displayed_text, self)      # color to be set in displayText()
@@ -34,10 +34,6 @@ class DisplayUnit(QGraphicsItem):
             self.font = self.controller.category_font
             self._text_item.setDefaultTextColor(QColor(Qt.white))
 
-        #:todo: figure out how to handle the following three things in this new approach
-        # self.setDisplayState(DisplayState.Blank)
-        # self.hide_category = False
-        # self.category_cover = QPixmap('../images/jeopardy.png')
         self.jeopardy_cover = QPixmap('../images/JeopardyCard.png')
         self.double_jeopardy_cover = QPixmap('../images/DoubleJeopardyCard.png')
         self.final_jeopardy_cover = QPixmap('../images/FinalJeopardyCard.png')

@@ -30,21 +30,18 @@ class ElementEditDialog(QDialog):
         self.line_edit_B = QLineEdit()
         self.line_edit_B.setText(self.text_B)
 
-        layout_A = QHBoxLayout()
-        layout_A.addWidget(label_A)
-        layout_A.addWidget(self.line_edit_A)
-
-        layout_B = QHBoxLayout()
-        layout_B.addWidget(label_B)
-        layout_B.addWidget(self.line_edit_B)
+        grid_layout = QGridLayout()
+        grid_layout.addWidget(label_A, 0, 0)
+        grid_layout.addWidget(self.line_edit_A, 0, 1)
+        grid_layout.addWidget(label_B, 1, 0)
+        grid_layout.addWidget(self.line_edit_B)
 
         button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
         button_box.accepted.connect(self.acceptEdit)
         button_box.rejected.connect(self.cancelEdit)
 
         layout = QVBoxLayout()
-        layout.addLayout(layout_A)
-        layout.addLayout(layout_B)
+        layout.addLayout(grid_layout)
         layout.addWidget(button_box)
 
         self.setLayout(layout)
@@ -57,3 +54,62 @@ class ElementEditDialog(QDialog):
     def cancelEdit(self):
         print("Got to dialogs.py cancelEdit.")
         self.reject()
+
+
+class GameInfoDialog(QDialog):
+
+    def __init__(self, name, topic, group, parent=None):
+        super(GameInfoDialog, self).__init__(parent)
+        self.name = name
+        self.topic = topic
+        self.group = group
+        self.setupUI()
+
+    def setupUI(self):
+
+        label_name = QLabel('Name:')
+        self.name_edit = QLineEdit()
+        self.name_edit.setText(self.name)
+        label_name.setBuddy(self.name_edit)
+        self.name_edit.setToolTip('Give the game a name. It will be used to create a filename.')
+
+        label_topic = QLabel('Topic:')
+        self.topic_edit = QLineEdit()
+        self.topic_edit.setText(self.topic)
+        label_topic.setBuddy(self.topic_edit)
+        self.topic_edit.setToolTip('If this game has a special theme or topic, enter it here.')
+
+        label_group = QLabel('Target Group:')
+        self.group_edit = QLineEdit()
+        self.group_edit.setText(self.group)
+        label_group.setBuddy(self.group_edit)
+        self.group_edit.setToolTip('If this game is aimed at particular groups, list them here separated by commas.')
+
+        grid_layout = QGridLayout()
+        grid_layout.addWidget(label_name,0, 0)
+        grid_layout.addWidget(self.name_edit, 0, 1)
+        grid_layout.addWidget(label_topic, 1, 0)
+        grid_layout.addWidget(self.topic_edit, 1, 1)
+        grid_layout.addWidget(label_group, 2, 0)
+        grid_layout.addWidget(self.group_edit, 2, 1)
+        grid_layout.setColumnStretch(0, 3)
+
+        button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
+        button_box.accepted.connect(self.acceptEdit)
+        button_box.rejected.connect(self.cancelEdit)
+
+        layout = QVBoxLayout()
+        layout.addLayout(grid_layout)
+        layout.addWidget(button_box)
+
+        self.setLayout(layout)
+
+    def acceptEdit(self):
+        self.name = self.name_edit.text()
+        self.topic = self.topic_edit.text()
+        self.group = self.group_edit.text()
+        self.accept()
+
+    def cancelEdit(self):
+        self.reject()
+
