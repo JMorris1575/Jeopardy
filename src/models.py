@@ -63,12 +63,12 @@ class Game():
             msg = 'unnamed Jeopardy game' + appendage
         return msg
 
-    def setCell(self, col, row, cell):
-        self.board[col][row] = cell
-        if self.isPlayable():
-            self.playable = True
-        else:
-            self.playable = False
+    # def setCell(self, col, row, cell):
+    #     self.board[col][row] = cell
+    #     if self.isPlayable():
+    #         self.playable = True
+    #     else:
+    #         self.playable = False
 
     def isPlayable(self):
         """

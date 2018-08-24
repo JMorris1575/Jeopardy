@@ -180,7 +180,7 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
         for col in range(6):
             row_list = []
             for row in range(5):
-                element = DisplayUnit(display_unit_size, DisplayType.Clue, self, col, row)
+                element = DisplayUnit(display_unit_size, DisplayType.Clue, self, col, row+1)
                 element.setPos(col * (display_unit_size.width() + gap),
                                display_unit_size.height() + 2 * gap + row * (display_unit_size.height() + gap))
                 element.setDisplayState(DisplayState.Blank)
@@ -275,18 +275,35 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
             if segment == Segment.FinalJeopardy:
                 pass
             else:
+                segment_name = segment.name
                 for col in range(6):
                     unit = self.category_displays[col]
-                    unit.setContents(segment, self.game.board[col][0].text_A, self.game.board[col][0].text_B)
+                    game_element = self.game.board[col][0]
+                    if segment_name in game_element.text_A.keys():
+                        text_A = game_element.text_A[segment_name]
+                    else:
+                        text_A = ''
+                    if segment_name in game_element.text_B.keys():
+                        text_B = game_element.text_B[segment_name]
+                    else:
+                        text_B = ''
+                    unit.setContents(segment, text_A, text_B)
                     for row in range(5):
                         unit = self.clue_displays[col][row]
-                        unit.setContents(segment, self.game.board[col][row+1].text_A, self.game.board[col][row].text_B)
-                        if segment == Segment.Jeopardy:
-                            self.clue_displays[col][row].contents[segment.name]['amount'] = \
-                                self.base_amount + self.base_amount * row
-                        elif segment == Segment.DoubleJeopardy:
-                            self.clue_displays[col][row].contents[segment.name]['amount'] = \
-                                2 * self.base_amount + 2 * self.base_amount * row
+                        game_element = self.game.board[col][row+1]
+                        if segment_name in game_element.text_A.keys():
+                            text_A = game_element.text_A[segment_name]
+                        else:
+                            text_A = ''
+                        if segment_name in game_element.text_B.keys():
+                            text_B = game_element.text_B[segment_name]
+                        else:
+                            text_B = ''
+                        unit.setContents(segment, text_A, text_B)
+                        if segment_name == 'Jeopardy':
+                            unit.contents[segment_name]['amount'] = self.base_amount + self.base_amount * row
+                        elif segment_name == 'DoubleJeopardy':
+                            unit.contents[segment_name]['amount'] = 2 * self.base_amount + 2 * self.base_amount * row
 
     def mousePressProcessing(self, unit, button):
         """

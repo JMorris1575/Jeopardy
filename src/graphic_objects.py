@@ -16,7 +16,9 @@ class DisplayUnit(QGraphicsItem):
         self.row = row
 
         self.displayed_text = ""    # the text that will be displayed
-        self.contents = {"Jeopardy":{"A":"", "B":""}, "DoubleJeopardy":{"A":"", "B":""}, "FinalJeopardy":{"A":"", "B":""}}
+        self.contents = {"Jeopardy":{"A":"", "B":""},
+                         "DoubleJeopardy":{"A":"", "B":""},
+                         "FinalJeopardy":{"A":"", "B":""}}
         if self.type == DisplayType.Clue:
             self.contents["Jeopardy"]['amount'] = 0          # amounts will be set later in the program
             self.contents["DoubleJeopardy"]['amount'] = 0
@@ -69,8 +71,16 @@ class DisplayUnit(QGraphicsItem):
     # Here is where my own methods start
 
     def setContents(self, segment, text_A, text_B):
-        self.contents[segment.name]['A'] = text_A
-        self.contents[segment.name]['B'] = text_B
+        """
+        Places text_A and text_B into this DisplayUnit
+        :param segment: Segment.Jeopardy, Segment.DoubleJeopardy or Segment.FinalJeopardy
+        :param text_A: string
+        :param text_B: string
+        :return: None
+        """
+        segment_name = segment.name
+        self.contents[segment_name]['A'] = text_A
+        self.contents[segment_name]['B'] = text_B
 
     def setCoverCard(self, segment):
         if segment == Segment.Jeopardy:
