@@ -226,3 +226,27 @@ Here is a quick plan for implementation, kind of Test-Driven-Development like:
 #. Wire up file_save to check if file_save_as is more appropriate and then save the file.
 
 That should be enough for now.
+
+Deciding the Next Step
+======================
+
+I've got the program working to the point that I can enter and save puzzles, though it only opens and saves the same
+temporary file: ``../Games/temp_game.jqz``. I can rename it later when I decide how I want the File->Open... process to
+work.
+
+My question now is what to do next. There are several options:
+
+#. Improve the simple input dialog boxes I have now.
+#. Design and build the scoreboards and wire them to work.
+#. Decide on how I want the File->Open... process to work and make it so.
+#. Work on the game playing portion of the program -- at least in the version that doesn't require the switches.
+#. Work on the timing lights.
+#. Make better graphics for the cover cards and make a graphic for the Daily Double card.
+#. Study how to implement a Help system.
+#. Work on a keyboard navigation system for the board to replace the mouse if so desired while editing or playing.
+#. Work on listing and allowing the user to change the game settings.
+#. Study how the leader notes can be printed and make it happen.
+#. Work on a splash screen and it's display at the beginning of the program.
+#. Work on Help->About -- perhaps using the splash screen with an OK button.
+
+

@@ -25,6 +25,9 @@ class ElementEditDialog(QDialog):
             label_A = QLabel("Clue:")
             label_B = QLabel("Correct Response:")
 
+        label_A.setAlignment(Qt.AlignRight)
+        label_B.setAlignment(Qt.AlignRight)
+
         self.line_edit_A = QLineEdit()
         self.line_edit_A.setText(self.text_A)
         self.line_edit_B = QLineEdit()
@@ -35,6 +38,10 @@ class ElementEditDialog(QDialog):
         grid_layout.addWidget(self.line_edit_A, 0, 1)
         grid_layout.addWidget(label_B, 1, 0)
         grid_layout.addWidget(self.line_edit_B)
+        # grid_layout.setColumnMinimumWidth(0, 100)
+        grid_layout.setColumnMinimumWidth(1, 250)
+        # grid_layout.setColumnStretch(0, 1)
+        # grid_layout.setColumnStretch(1, 2)
 
         button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
         button_box.accepted.connect(self.acceptEdit)

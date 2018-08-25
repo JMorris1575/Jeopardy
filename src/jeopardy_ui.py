@@ -142,8 +142,7 @@ class JeopardyUI(object):
         self.view = QGraphicsView()
         self.view.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.view.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.view.setViewportUpdateMode(QGraphicsView.BoundingRectViewportUpdate) #todo: find out what this does
-
+        self.view.setViewportUpdateMode(QGraphicsView.SmartViewportUpdate)
         self.view.setScene(self.stage_set)
         self.view.setViewportUpdateMode(QGraphicsView.FullViewportUpdate)
 
@@ -156,6 +155,8 @@ class JeopardyUI(object):
             result = self.checkForSave()
             if result == QMessageBox.Cancel:
                 return
+            elif result == QMessageBox.Save:
+                self.file_save()
         # need a dialog here to select a file
         self.game_pathname = '../games/temp_game.jqz'
         self.game = self.game.read_game(self.game_pathname)
@@ -183,11 +184,6 @@ class JeopardyUI(object):
         if self.game_pathname == '':
             self.file_save_as()
             return
-        # # Check to see if the file in memory needs saving
-        # if self.game_modified:
-        #     result = self.checkForSave()
-        #     if result == QMessageBox.Cancel:
-        #         return
         self.game.write_game(self.game_pathname)
         self.game_modified = False
 
@@ -207,6 +203,12 @@ class JeopardyUI(object):
 
     def closeEvent(self, event):
         print("Got to closeEvent.", event)
+        if self.game_modified:
+            result = self.checkForSave()
+            if result == QMessageBox.Cancel:
+                return
+            elif result == QMessageBox.Save:
+                self.file_save()
         if self.category_font_id != -1:
             self.font_database.removeApplicationFont(self.category_font_id)
         if self.clue_font_id != -1:
@@ -236,6 +238,7 @@ class JeopardyUI(object):
     def edit_exit_editing(self):
         print("Got to edit_exit_editing.")
         self.setProgramMode(ProgramMode.Neutral)
+        self.resetBoard()
 
     def edit_cut(self):
         print("Got to edit_cut.")
@@ -316,6 +319,4 @@ class JeopardyUI(object):
         msgBox = QMessageBox(icon, title, message, buttons, self)
         msgBox.setDefaultButton(QMessageBox.Save)
         result = msgBox.exec()
-        if result == QMessageBox.Save:
-            self.file_save()
         return result
