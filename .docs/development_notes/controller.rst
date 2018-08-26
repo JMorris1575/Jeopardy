@@ -248,5 +248,9 @@ My question now is what to do next. There are several options:
 #. Study how the leader notes can be printed and make it happen.
 #. Work on a splash screen and it's display at the beginning of the program.
 #. Work on Help->About -- perhaps using the splash screen with an OK button.
+#. Work on right-clicking to display the secondary text of a DisplayUnit.
+#. Work on expanding a DisplayUnit when clicked during a game.
+#. Work on simulating a TV camera view by scaling and moving the scene or changing the viewport somehow.
+
 
 

@@ -14,6 +14,7 @@ class DisplayUnit(QGraphicsItem):
         self.controller = controller
         self.col = col
         self.row = row
+        self.display_state = DisplayState.Blank
 
         self.displayed_text = ""    # the text that will be displayed
         self.contents = {"Jeopardy":{"A":"", "B":""},
@@ -29,7 +30,7 @@ class DisplayUnit(QGraphicsItem):
         self._text_item = QGraphicsTextItem(self.displayed_text, self)      # color to be set in displayText()
         # self._text_item.setDefaultTextColor(QColor(self.color))
 
-        # self.setFlags(Qt.ItemIsSelectable | Qt.Focusable)
+        # self.setFlags(QGraphicsItem.ItemIsSelectable | QGraphicsItem.ItemIsFocusable)
         self._text_item.setTextInteractionFlags(Qt.NoTextInteraction)
 
         if self.type == DisplayType.Category:

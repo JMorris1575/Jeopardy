@@ -134,7 +134,11 @@ class JeopardyUI(object):
         self.help_about_action = helpMenu.addAction("&About")
         self.help_about_action.triggered.connect(self.help_about)
 
-        # Central Widget
+        ###############################################################
+        #                                                             #
+        #              Scene, Viewport and Central Widget             #
+        #                                                             #
+        ###############################################################
 
         self.stage_set = QGraphicsScene()
         self.stage_set.setBackgroundBrush(Qt.black)

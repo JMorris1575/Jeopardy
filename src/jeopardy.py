@@ -49,7 +49,19 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
         self.gamefile_changed = True            # temporarily initialized to True while building checkForSave feature
         self.game_filename = ""
 
-        self.createBoard(self.screen_geometry, self.stage_set)
+        # compute the size of the DisplayUnits
+        display_unit_width = self.screen_geometry.width() * 0.1  # calculates 10% of the available width
+        display_unit_height = display_unit_width * 9/16       # maintain a 16:9 aspect ratio
+        display_unit_size = QSizeF(display_unit_width, display_unit_height)
+        print("display_unit_size = ", display_unit_size)
+
+        # calculate the gap between display units (5% of the width of the unit)
+        gap = display_unit_size.width()/20
+
+        self.createBoard(self.stage_set, display_unit_size, gap)
+        self.stage_set.setSceneRect(0, 0, 1000, 600)
+        # self.view.fitInView(self.stage_set.itemsBoundingRect(), Qt.KeepAspectRatio)
+        print("self.view.sceneRect() = ", self.view.sceneRect())
 
     def getScreenGeometry(self):
         desktop = self.app.desktop()
@@ -151,26 +163,18 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
         self.game_segment = segment
         self.resetBoard()
 
-    def createBoard(self, screen_geometry, scene):
+    def createBoard(self, scene, size, gap):
         """
         Creates a blank Jeopardy board for later use
         :param size: QFSize telling the width and height of the display units for this screen
         :return: None
         """
-        # compute the size of the DisplayUnits
-        display_unit_width = screen_geometry.width() * 0.1  # calculates 10% of the available width
-        display_unit_height = display_unit_width * 9/16       # maintain a 16:9 aspect ratio
-        display_unit_size = QSizeF(display_unit_width, display_unit_height)
-
-
-        # calculate the gap between display units (5% of the width of the unit)
-        gap = display_unit_size.width()/20
 
         # Create the category displays
         self.category_displays = []
         for col in range(6):
-            element = DisplayUnit(display_unit_size, DisplayType.Category, self, col, 0)
-            element.setPos(col * (display_unit_size.width() + gap), 0)
+            element = DisplayUnit(size, DisplayType.Category, self, col, 0)
+            element.setPos(col * (size.width() + gap), 0)
             element.setDisplayState(DisplayState.Blank)
             self.category_displays.append(element)
             scene.addItem(element)
@@ -180,9 +184,9 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
         for col in range(6):
             row_list = []
             for row in range(5):
-                element = DisplayUnit(display_unit_size, DisplayType.Clue, self, col, row+1)
-                element.setPos(col * (display_unit_size.width() + gap),
-                               display_unit_size.height() + 2 * gap + row * (display_unit_size.height() + gap))
+                element = DisplayUnit(size, DisplayType.Clue, self, col, row+1)
+                element.setPos(col * (size.width() + gap),
+                               size.height() + 2 * gap + row * (size.height() + gap))
                 element.setDisplayState(DisplayState.Blank)
                 scene.addItem(element)
                 row_list.append(element)
@@ -313,7 +317,7 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
         :return: None
         """
         if self.program_mode == ProgramMode.Editing:
-            self.editGameElement(unit)
+            self.editGameElement(unit, button)
         elif self.program_mode == ProgramMode.Playing:
             unit.displayed_text = "Ready to reveal a clue."
         elif self.program_mode == ProgramMode.Neutral:
@@ -323,27 +327,31 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
         else:
             unit.displayed_text = "Unknown program_mode in mousePressProcessing"
 
-    def editGameElement(self, unit):
+    def editGameElement(self, unit, button):
         """
-        Allows the user to edit the contents of the Game() element displayed by the current unit
+        LeftClick allows the user to edit the contents of the Game() element displayed by the current unit
+        RightClick toggles the displayed_text between the A_Text and the B_Text
         :param unit: The DisplayUnit that was clicked
         :return: None
         """
-        # unit.setDisplayState(DisplayState.A_Text)
-        # unit._text_item.setTextInteractionFlags(Qt.TextEditorInteraction)
-        text_A = unit.contents[self.game_segment.name]['A']
-        text_B = unit.contents[self.game_segment.name]['B']
-        edit_dialog = ElementEditDialog(unit.type, text_A, text_B)
-        if edit_dialog.exec():
-            text_A = edit_dialog.text_A
-            text_B = edit_dialog.text_B
-            unit.setContents(self.game_segment, text_A, text_B)
-            self.game.board[unit.col][unit.row].setContents(self.game_segment, text_A, text_B)
-            if self.game.isPlayable():
-                self.game.playable = True
-            unit.setDisplayState(DisplayState.A_Text)
-
-            self.game_modified = True
+        if button == Qt.LeftButton:
+            text_A = unit.contents[self.game_segment.name]['A']
+            text_B = unit.contents[self.game_segment.name]['B']
+            edit_dialog = ElementEditDialog(unit.type, text_A, text_B)
+            if edit_dialog.exec():
+                text_A = edit_dialog.text_A
+                text_B = edit_dialog.text_B
+                unit.setContents(self.game_segment, text_A, text_B)
+                self.game.board[unit.col][unit.row].setContents(self.game_segment, text_A, text_B)
+                if self.game.isPlayable():
+                    self.game.playable = True
+                unit.setDisplayState(DisplayState.A_Text)
+                self.game_modified = True
+        elif button == Qt.RightButton:
+            if unit.display_state == DisplayState.A_Text:
+                unit.setDisplayState(DisplayState.B_Text)
+            elif unit.display_state == DisplayState.B_Text:
+                unit.setDisplayState(DisplayState.A_Text)
 
 
 if __name__ == "__main__":
