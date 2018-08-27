@@ -172,6 +172,7 @@ class JeopardyUI(object):
 
         # self.hideCategories(self.game_segment)
         # self.fillBoard(self.game, Segment.Jeopardy)
+        print('at the end of file_open: self.size() = ', self.size())
 
     def file_create(self):
         print("Got to file_create.")

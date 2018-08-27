@@ -53,15 +53,15 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
         display_unit_width = self.screen_geometry.width() * 0.1  # calculates 10% of the available width
         display_unit_height = display_unit_width * 9/16       # maintain a 16:9 aspect ratio
         display_unit_size = QSizeF(display_unit_width, display_unit_height)
-        print("display_unit_size = ", display_unit_size)
+        print("in Jeopardy.__init__: display_unit_size = ", display_unit_size)
 
         # calculate the gap between display units (5% of the width of the unit)
         gap = display_unit_size.width()/20
 
         self.createBoard(self.stage_set, display_unit_size, gap)
-        self.stage_set.setSceneRect(0, 0, 1000, 600)
+        # self.stage_set.setSceneRect(0, 0, 1000, 600)
         # self.view.fitInView(self.stage_set.itemsBoundingRect(), Qt.KeepAspectRatio)
-        print("self.view.sceneRect() = ", self.view.sceneRect())
+        print("in Jeopardy.__init__: self.view.sceneRect() = ", self.view.sceneRect())
 
     def getScreenGeometry(self):
         desktop = self.app.desktop()
@@ -187,10 +187,22 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
                 element = DisplayUnit(size, DisplayType.Clue, self, col, row+1)
                 element.setPos(col * (size.width() + gap),
                                size.height() + 2 * gap + row * (size.height() + gap))
+                if col == 0:
+                    print('in createBoard: element.pos(), element.size() = ', element.pos(), element.size)
                 element.setDisplayState(DisplayState.Blank)
                 scene.addItem(element)
                 row_list.append(element)
             self.clue_displays.append(row_list)
+
+        print('in createBoard before: self.view.sceneRect() = ', self.view.sceneRect())
+        # # Set the SceneRect to show a border around all items
+        # boundingRect = self.stage_set.itemsBoundingRect()
+        # boundingRect.setLeft(boundingRect.left() - 10)
+        # boundingRect.setTop(boundingRect.top() - 10)
+        # boundingRect.setSize(boundingRect.size() + QSizeF(20, 20))
+        # self.view.setSceneRect(boundingRect)
+        print('in createBoard after: self.view.sceneRect() = ', self.view.sceneRect())
+        print('in createBoard: self.size() = ', self.size())
 
     def resetBoard(self):
         """
