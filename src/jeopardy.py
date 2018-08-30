@@ -63,10 +63,204 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
         # self.view.fitInView(self.stage_set.itemsBoundingRect(), Qt.KeepAspectRatio)
         print("in Jeopardy.__init__: self.view.sceneRect() = ", self.view.sceneRect())
 
+    ################################################################################
+    #                                                                              #
+    #                               Menu Action Handlers                           #
+    #                                                                              #
+    ################################################################################
+
+    # File Menu---------------------------------------------------------------------
+
+    def file_open(self):
+        print("Opening temporary game file: '../Games/temp_game.jqz'")
+        # Check to see if the file in memory needs saving
+        if self.game_modified:
+            result = self.checkForSave()
+            if result == QMessageBox.Cancel:
+                return
+            elif result == QMessageBox.Save:
+                self.file_save()
+        # need a dialog here to select a file
+        self.game_pathname = '../games/temp_game.jqz'
+        self.game = self.game.read_game(self.game_pathname)
+        self.fillBoard()
+        self.game.playable = self.game.isPlayable()
+        print("The temporary game has been marked playable = ", self.game.playable)
+        self.setProgramMode(ProgramMode.Neutral)
+        self.setSegment(Segment.Jeopardy)
+
+        # self.hideCategories(self.game_segment)
+        # self.fillBoard(self.game, Segment.Jeopardy)
+        print('at the end of file_open: self.size() = ', self.size())
+
+    def file_create(self):
+        print("Got to file_create.")
+        self.createGame()
+
+    def file_close(self):
+        print("Got to file_close.")
+        # check for unsaved changes here
+        self.game = Game()                      # clear out all the former game entries
+        self.setProgramMode(ProgramMode.Empty)
+
+    def file_save(self):
+        print("Got to file_save.")
+        if self.game_pathname == '':
+            self.file_save_as()
+            return
+        self.game.write_game(self.game_pathname)
+        self.game_modified = False
+
+    def file_save_as(self):
+        print("Got to file_save_as.")
+        # Just for now save the game to Games/temp_game.jqz
+        self.game_pathname = '../Games/temp_game.jqz'
+        self.game.write_game(self.game_pathname)
+        self.game_modified = False
+
+    def file_print(self):
+        print("Got to file_print")
+
+    def file_exit(self):
+        print("Got to file_exit.")
+        self.close()
+
+    def closeEvent(self, event):
+        print("Got to closeEvent.", event)
+        if self.game_modified:
+            result = self.checkForSave()
+            if result == QMessageBox.Cancel:
+                return
+            elif result == QMessageBox.Save:
+                self.file_save()
+        if self.category_font_id != -1:
+            self.font_database.removeApplicationFont(self.category_font_id)
+        if self.clue_font_id != -1:
+            self.font_database.removeApplicationFont(self.clue_font_id)
+        # check for unsaved files here
+
+    # Edit Menu ----------------------------------------------------------------------------
+
+    def edit_modify_info(self):
+        print("Got to edit_modify.")
+        self.setProgramMode(ProgramMode.Editing)
+        self.getGameInfo()
+
+    def edit_modify_jeopardy(self):
+        print("Got to edit_modify_jeopardy.")
+        self.setProgramMode(ProgramMode.Editing)
+        self.setSegment(Segment.Jeopardy)
+
+    def edit_modify_double_jeopardy(self):
+        print("Got to edit_modify_double_jeopardy.")
+        self.setProgramMode(ProgramMode.Editing)
+        self.setSegment(Segment.DoubleJeopardy)
+
+    def edit_modify_final_jeopardy(self):
+        print("Got to edit_modify_final_jeopardy.")
+        self.setProgramMode(ProgramMode.Editing)
+        self.setSegment(Segment.FinalJeopardy)
+
+    def edit_exit_editing(self):
+        print("Got to edit_exit_editing.")
+        self.setProgramMode(ProgramMode.Neutral)
+        self.resetBoard()
+
+    def edit_cut(self):
+        print("Got to edit_cut.")
+
+    def edit_copy(self):
+        print("Got to edit_copy.")
+
+    def edit_paste(self):
+        print("Got to edit_paste.")
+
+    # Game Menu -------------------------------------------------------------------------
+
+    def game_names(self):
+        print("Got to game_names.")
+        self.clue_displays[2][1].display_state = DisplayState.Clue
+
+    def game_practice(self):
+        print("Got to game_practice.")
+
+    def game_play_jeopardy(self):
+        print("Got to game_play_jeopardy.")
+        self.setProgramMode(ProgramMode.Playing)
+        self.setSegment(Segment.Jeopardy)
+        self.hideCategories(Segment.Jeopardy)
+
+    def game_play_double_jeopardy(self):
+        print("Got to game_play_double_jeopardy")
+        self.setProgramMode(ProgramMode.Playing)
+        self.setSegment(Segment.DoubleJeopardy)
+        self.hideCategories(Segment.DoubleJeopardy)
+
+    def game_play_final_jeopardy(self):
+        print("Got to game_play_final_jeoardy")
+        self.setProgramMode(ProgramMode.Playing)
+        self.setSegment(Segment.FinalJeopardy)
+        self.hideCategories(Segment.FinalJeopardy)
+
+    def game_correct(self):
+        print("Got to game_correct.")
+
+    def game_end(self):
+        """
+        Ends the current game and places the program in Neutral mode
+        :return: None
+        """
+        print("Got to game_end")
+        # :todo: First there should be a warning message before ending the game
+        self.setProgramMode(ProgramMode.Neutral)
+
+    def game_settings(self):
+        print("Got to game_settings.")
+        import time
+        time.sleep(5)
+        print("That was a quick sleep!")
+
+    # Help Menu -------------------------------------------------------------------------
+
+    def help_using_program(self):
+        print("Got to help_using_program.")
+
+    def help_rules(self):
+        print("Got to help_rules.")
+
+    def help_about(self):
+        print("Got to help_about.")
+
+    ###############################################################################################
+    #                                                                                             #
+    #                                       Support Functions                                     #
+    #                                                                                             #
+    ###############################################################################################
+
+    def checkForSave(self):
+        """
+        Checks if the user wants to save the current game file and, if so, saves it
+        :return: QMessageBox response - either Save, Discard or Cancel
+        """
+        title = "Check For Save"
+        message = "The current game file has been modified, do you want to save it?"
+        buttons = QMessageBox.Save | QMessageBox.Discard | QMessageBox.Cancel
+        icon = QMessageBox.Question
+        msgBox = QMessageBox(icon, title, message, buttons, self)
+        msgBox.setDefaultButton(QMessageBox.Save)
+        result = msgBox.exec()
+        return result
+
     def getScreenGeometry(self):
         desktop = self.app.desktop()
         screenNumber = desktop.screenNumber(self)  # gets the screen the form is on
         return desktop.availableGeometry(screenNumber)  # as a QRect
+
+    ###############################################################################################
+    #                                                                                             #
+    #                                      Main Functions                                         #
+    #                                                                                             #
+    ###############################################################################################
 
     def setProgramMode(self, mode):
         self.program_mode = mode
@@ -193,16 +387,6 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
                 scene.addItem(element)
                 row_list.append(element)
             self.clue_displays.append(row_list)
-
-        print('in createBoard before: self.view.sceneRect() = ', self.view.sceneRect())
-        # # Set the SceneRect to show a border around all items
-        # boundingRect = self.stage_set.itemsBoundingRect()
-        # boundingRect.setLeft(boundingRect.left() - 10)
-        # boundingRect.setTop(boundingRect.top() - 10)
-        # boundingRect.setSize(boundingRect.size() + QSizeF(20, 20))
-        # self.view.setSceneRect(boundingRect)
-        print('in createBoard after: self.view.sceneRect() = ', self.view.sceneRect())
-        print('in createBoard: self.size() = ', self.size())
 
     def resetBoard(self):
         """
