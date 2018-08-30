@@ -69,6 +69,14 @@ class DisplayUnit(QGraphicsItem):
         painter.drawPixmap(target, pixmap, source)
         self.formatText()
 
+    # Properties
+
+    def width(self):
+        return self.boundingRect().width()
+
+    def height(self):
+        return self.boundingRect().height()
+
     # Here is where my own methods start
 
     def setContents(self, segment, text_A, text_B):

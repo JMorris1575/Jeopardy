@@ -9,6 +9,8 @@ import jeopardy_ui
 from models import *
 from graphic_objects import *
 
+import time
+
 
 class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
 
@@ -53,23 +55,22 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
         display_unit_width = self.screen_geometry.width() * 0.1  # calculates 10% of the available width
         display_unit_height = display_unit_width * 9/16       # maintain a 16:9 aspect ratio
         display_unit_size = QSizeF(display_unit_width, display_unit_height)
-        print("in Jeopardy.__init__: display_unit_size = ", display_unit_size)
 
         # calculate the gap between display units (5% of the width of the unit)
-        gap = display_unit_size.width()/20
+        self.gap = display_unit_size.width()/20
 
-        self.createBoard(self.stage_set, display_unit_size, gap)
+        self.createBoard(self.stage_set, display_unit_size, self.gap)
         # self.stage_set.setSceneRect(0, 0, 1000, 600)
         # self.view.fitInView(self.stage_set.itemsBoundingRect(), Qt.KeepAspectRatio)
         print("in Jeopardy.__init__: self.view.sceneRect() = ", self.view.sceneRect())
 
-    ################################################################################
-    #                                                                              #
-    #                               Menu Action Handlers                           #
-    #                                                                              #
-    ################################################################################
+    ###############################################################################################
+    #                                                                                             #
+    #                                   Menu Action Handlers                                      #
+    #                                                                                             #
+    ###############################################################################################
 
-    # File Menu---------------------------------------------------------------------
+    # File Menu------------------------------------------------------------------------------------
 
     def file_open(self):
         print("Opening temporary game file: '../Games/temp_game.jqz'")
@@ -84,7 +85,8 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
         self.game_pathname = '../games/temp_game.jqz'
         self.game = self.game.read_game(self.game_pathname)
         self.fillBoard()
-        self.game.playable = self.game.isPlayable()
+        # self.game.playable = self.game.isPlayable()
+        self.game.playable = True;          # Delete this and uncomment the line above when not testing
         print("The temporary game has been marked playable = ", self.game.playable)
         self.setProgramMode(ProgramMode.Neutral)
         self.setSegment(Segment.Jeopardy)
@@ -139,7 +141,7 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
             self.font_database.removeApplicationFont(self.clue_font_id)
         # check for unsaved files here
 
-    # Edit Menu ----------------------------------------------------------------------------
+    # Edit Menu -----------------------------------------------------------------------------------
 
     def edit_modify_info(self):
         print("Got to edit_modify.")
@@ -175,7 +177,7 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
     def edit_paste(self):
         print("Got to edit_paste.")
 
-    # Game Menu -------------------------------------------------------------------------
+    # Game Menu -----------------------------------------------------------------------------------
 
     def game_names(self):
         print("Got to game_names.")
@@ -185,22 +187,19 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
         print("Got to game_practice.")
 
     def game_play_jeopardy(self):
-        print("Got to game_play_jeopardy.")
         self.setProgramMode(ProgramMode.Playing)
         self.setSegment(Segment.Jeopardy)
-        self.hideCategories(Segment.Jeopardy)
+        self.playMode = PlayMode.StartGame
 
     def game_play_double_jeopardy(self):
-        print("Got to game_play_double_jeopardy")
         self.setProgramMode(ProgramMode.Playing)
         self.setSegment(Segment.DoubleJeopardy)
-        self.hideCategories(Segment.DoubleJeopardy)
+        self.playMode = PlayMode.StartGame
 
     def game_play_final_jeopardy(self):
-        print("Got to game_play_final_jeoardy")
         self.setProgramMode(ProgramMode.Playing)
         self.setSegment(Segment.FinalJeopardy)
-        self.hideCategories(Segment.FinalJeopardy)
+        self.playMode = PlayMode.StartGame
 
     def game_correct(self):
         print("Got to game_correct.")
@@ -220,7 +219,7 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
         time.sleep(5)
         print("That was a quick sleep!")
 
-    # Help Menu -------------------------------------------------------------------------
+    # Help Menu -----------------------------------------------------------------------------------
 
     def help_using_program(self):
         print("Got to help_using_program.")
@@ -505,6 +504,12 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
                         elif segment_name == 'DoubleJeopardy':
                             unit.contents[segment_name]['amount'] = 2 * self.base_amount + 2 * self.base_amount * row
 
+    ###############################################################################################
+    #                                                                                             #
+    #                                       Processing Functions                                  #
+    #                                                                                             #
+    ###############################################################################################
+
     def mousePressProcessing(self, unit, button):
         """
         Processes mouse events received from the DisplayUnits
@@ -515,13 +520,15 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
         if self.program_mode == ProgramMode.Editing:
             self.editGameElement(unit, button)
         elif self.program_mode == ProgramMode.Playing:
-            unit.displayed_text = "Ready to reveal a clue."
+            self.playGame(unit, button)
         elif self.program_mode == ProgramMode.Neutral:
             unit.displayed_text = "Shift to Edit mode"
         elif self.program_mode == ProgramMode.Empty:
             unit.displayed_text = "Please load or create a game."
         else:
             unit.displayed_text = "Unknown program_mode in mousePressProcessing"
+
+
 
     def editGameElement(self, unit, button):
         """
@@ -548,6 +555,60 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
                 unit.setDisplayState(DisplayState.B_Text)
             elif unit.display_state == DisplayState.B_Text:
                 unit.setDisplayState(DisplayState.A_Text)
+
+    def playGame(self, unit, button):
+        """
+        Uses the current playMode to dispatch operations to the appropriate routine
+        :param unit: the DisplayElement that was clicked
+        :param button: which mousebutton was received
+        :return: None
+        """
+        print('Got to playGame() with self.playMode = ', self.playMode.name)
+        print("with (col, row) = ", "(" + str(unit.col) + ", " + str(unit.row) + ")")
+        if self.playMode == PlayMode.StartGame:
+            self.zoomToCategories(self.category_displays[0], button)
+        elif self.playMode == PlayMode.RevealCategories:
+            self.moveToNextCategory(unit)
+        elif self.playMode == PlayMode.SelectClue:
+            self.zoomToClue(unit)
+        else:
+            print("You need to add code to self.playGame().")
+
+    def zoomToCategories(self, unit, button):
+        self.zoomIn(unit, 0, 0)
+        self.playMode = PlayMode.RevealCategories
+        self.revealCategory(0)
+
+    def moveToNextCategory(self, unit, category=0):
+        if unit.col != 0 and unit.col != 5:     # either just zoomed in or in the last column
+            print("In moveToNextCategory (col, row) = ", "(" + str(unit.col) + ", " + str(unit.row) + ")")
+            self.view.translate(unit.width(), 0)
+            self.view.repaint()
+        time.sleep(5)
+        unit.setDisplayState(DisplayState.A_Text)
+        if unit.contents[self.game_segment.name]['B'] != "":
+            time.sleep(3)
+            unit.setDisplayState(DisplayState.B_Text)
+        if unit.col == 5:
+            self.zoomOut()
+            self.playMode = PlayMode.SelectClue
+
+    def zoomToClue(self, unit):
+        print("Got to zoomToClue()")
+
+    def zoomIn(self, unit, col, row):
+        self.view.centerOn(col * (unit.width() + self.gap) + unit.width()/2,
+                           row * (unit.height() + self.gap) + unit.height()/2)
+        for frame in range(25):
+            self.view.resetTransform()
+            zoom = 1 + (5 * frame)/24
+            self.view.scale(zoom, zoom)
+            time.sleep(0.0167)
+            self.view.repaint()
+
+    def zoomOut(self):
+        self.view.scale(0.167, 0.167)
+
 
 
 if __name__ == "__main__":

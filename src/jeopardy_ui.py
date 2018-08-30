@@ -13,13 +13,13 @@ class JeopardyUI(object):
 
     def createUI(self):
 
-        ##########################################
-        #                                        #
-        #              menuBar                   #
-        #                                        #
-        ##########################################
+        ###########################################################################################
+        #                                                                                         #
+        #                                       menuBar                                           #
+        #                                                                                         #
+        ###########################################################################################
 
-        # fileMenu
+        # fileMenu --------------------------------------------------------------------------------
 
         fileMenu = self.menuBar().addMenu("&File")
         self.file_open_action = fileMenu.addAction("&Open...")
@@ -54,7 +54,7 @@ class JeopardyUI(object):
         self.file_exit_action = fileMenu.addAction("E&xit")
         self.file_exit_action.triggered.connect(self.file_exit)
 
-        # editMenu
+        # editMenu --------------------------------------------------------------------------------
 
         editMenu = self.menuBar().addMenu("&Edit")
 
@@ -88,7 +88,7 @@ class JeopardyUI(object):
         self.edit_paste_action.setShortcuts(QKeySequence.Paste)
         self.edit_paste_action.triggered.connect(self.edit_paste)
 
-        # gameMenu
+        # gameMenu --------------------------------------------------------------------------------
 
         gameMenu = self.menuBar().addMenu("&Game")
 
@@ -119,7 +119,7 @@ class JeopardyUI(object):
         self.game_settings_action = gameMenu.addAction("Settings...")
         self.game_settings_action.triggered.connect(self.game_settings)
 
-        # helpMenu
+        # helpMenu --------------------------------------------------------------------------------
 
         helpMenu = self.menuBar().addMenu("&Help")
 
@@ -134,11 +134,11 @@ class JeopardyUI(object):
         self.help_about_action = helpMenu.addAction("&About")
         self.help_about_action.triggered.connect(self.help_about)
 
-        ###############################################################
-        #                                                             #
-        #              Scene, Viewport and Central Widget             #
-        #                                                             #
-        ###############################################################
+        ###########################################################################################
+        #                                                                                         #
+        #                            Scene, Viewport and Central Widget                           #
+        #                                                                                         #
+        ###########################################################################################
 
         self.stage_set = QGraphicsScene()
         self.stage_set.setBackgroundBrush(Qt.black)

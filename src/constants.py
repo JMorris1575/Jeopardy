@@ -25,5 +25,11 @@ class DisplayState(Enum):
     SegmentCard = 7
     DailyDouble = 8
 
+class PlayMode(Enum):
+    StartGame = 1
+    RevealCategories = 2
+    SelectClue = 3
+
+
 
 

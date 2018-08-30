@@ -259,6 +259,12 @@ Working on the game playing portion of the program will take care of many of the
 do that. Based on how the game is played here is a possible order in which to tackle each item:
 
 #. Sequence of events to reveal categories
+    A. When entering into one of the play actions on the Game menu, set self.playMode to PlayMode.StartGame
+    #. Left clicking on any element zooms to the first item and sets self.playMode to PlayMode.RevealCategories
+    #. After a delay, reveals the title of the first item is revealed
+    #. Each subsequent left-click moves to the next category and, after a delay, reveals the title
+    #. After the last category is revealed the board zooms back to original size
+    #. self.playMode is set to PlayMode.SelectClue
 #. Reveal a requested clue
 #. Activate the buttons, if available, and start the group response timer
 #. If the group response timer times out, pause for a bit and then reveal the correct response
