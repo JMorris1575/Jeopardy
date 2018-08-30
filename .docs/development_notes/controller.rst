@@ -252,5 +252,27 @@ My question now is what to do next. There are several options:
 #. Work on expanding a DisplayUnit when clicked during a game.
 #. Work on simulating a TV camera view by scaling and moving the scene or changing the viewport somehow.
 
+Working on the Game Playing Portion of the Program
+==================================================
 
+Working on the game playing portion of the program will take care of many of the other items in the list above so I will
+do that. Based on how the game is played here is a possible order in which to tackle each item:
+
+#. Sequence of events to reveal categories
+#. Reveal a requested clue
+#. Activate the buttons, if available, and start the group response timer
+#. If the group response timer times out, pause for a bit and then reveal the correct response
+#. If a player responds
+    A. start the individual response timer
+    #. if the individual response timer times out before they have given an answer subtract the points
+    #. if the player responds and is right
+        i. show the correct response
+        #. add the score for that question to that player's score
+        #. give that player "control of the board"
+    #. If a player responds and is wrong
+        i. subtract the score for that question from that player's score
+        #. deactivate their button
+        #. activate the other two buttons
+        #. start the group response timer again
+#. Completed clues are left blank
 

@@ -7,6 +7,45 @@ from PyQt5.QtWidgets import *
 
 import time
 
+class ZoomDialog(QDialog):
+
+    def __init__(self, parent=None):
+        super(ZoomDialog, self).__init__(parent)
+
+        colLabel = QLabel("Column:")
+        colSpin = QSpinBox()
+        colSpin.setMaximum(5)
+        colLabel.setBuddy(colSpin)
+        colLabel.setAlignment(Qt.AlignRight)
+
+        rowLabel = QLabel("Row:")
+        rowSpin = QSpinBox()
+        rowSpin.setMaximum(5)
+        rowLabel.setBuddy(rowSpin)
+        rowLabel.setAlignment(Qt.AlignRight)
+
+        zoomButton = QPushButton("Zoom")
+        zoomButton.click.connect(self.zoom_click)
+
+        exitButton = QPushButton("Exit")
+        exitButton.click.connect(self.exit_click)
+
+        layout = QGridLayout()
+        layout.addItem(colLabel, 0, 0)
+        layout.addItem(colSpin, 0, 1)
+        layout.addItem(rowLabel, 1, 0)
+        layout.addItem(rowSpin, 1, 1)
+        layout.addItem(zoomButton, 2, 0)
+        layout.addItem(exitButton, 2, 1)
+
+    def zoom_click(self):
+        print("Got to zoom_click().")
+
+    def exit_click(self):
+        print("Got to exit_click().")
+
+        self.setLayout(layout)
+
 class GraphicsTester(QMainWindow):
 
     def __init__(self, parent=None):
@@ -28,6 +67,9 @@ class GraphicsTester(QMainWindow):
         self.setCentralWidget(self.view)
         self.Setup()
 
+    def coords(self, col, row):
+        return QPointF(col * 160, row * 110)
+
     def MoveScene(self):
         increment = 310/49
         for i in range(50):
@@ -36,8 +78,20 @@ class GraphicsTester(QMainWindow):
             self.view.repaint()
 
     def ZoomIn(self):
-        # increment = 1/49
-        self.view.centerOn(3 * (150 + 10) + 75, 3 * (100 + 10) + 50)
+        self.view.centerOn(3 * 160 + 75, 4 * 110 + 50)
+        for i in range(25):
+            self.view.resetTransform()
+            zoom = 1 + (5 * i)/24
+            print(zoom)
+            self.view.scale(zoom, zoom)
+            time.sleep(0.0167)
+            self.view.repaint()
+        pos = self.coords(3,2)
+        size = QSizeF(150, 100)
+        print(pos + QPointF(size.width()/2, size.height()/2))
+
+    def clickZoom(self, col, row):
+        self.view.centerOn(col * 160 + 75, row * 110 + 50)
         for i in range(25):
             self.view.resetTransform()
             zoom = 1 + (5 * i)/24
@@ -52,7 +106,7 @@ class GraphicsTester(QMainWindow):
         #     self.view.scale(2 - increment, 2 - increment)
         #     time.sleep(0.0167)
         #     self.view.repaint()
-        self.view.scale(0.333, 0.333)
+        self.view.scale(0.167, 0.167)
 
     def Setup(self):
         redPen = QPen()
@@ -69,10 +123,18 @@ class GraphicsTester(QMainWindow):
                     rect.setPen(bluePen)
                 else:
                     rect.setPen(redPen)
-                rect.setPos(col * (150 + 10), row * (100 + 10))
+                rect.setPos(self.coords(col, row))
                 text.setPos(col * (150 + 10) + 60, row * (100 + 10) + 40)
                 self.scene.addItem(rect)
                 self.scene.addItem(text)
+
+    def mousePressEvent(self, event):
+        print("Got to mousePressEvent with event = ", event)
+        x = event.x()
+        y = event.y()
+        col = int(x/165)
+        row = int(y/115)
+        self.clickZoom(col, row)
 
 
 if __name__ == '__main__':
