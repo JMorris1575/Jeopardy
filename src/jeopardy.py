@@ -577,28 +577,44 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
     def zoomToCategories(self, unit, button):
         self.zoomIn(unit, 0, 0)
         self.playMode = PlayMode.RevealCategories
-        self.revealCategory(0)
+        self.moveToNextCategory(unit)       # or self.revealCategory(0) - yet to be written
 
-    def moveToNextCategory(self, unit, category=0):
-        if unit.col != 0 and unit.col != 5:     # either just zoomed in or in the last column
-            print("In moveToNextCategory (col, row) = ", "(" + str(unit.col) + ", " + str(unit.row) + ")")
-            self.view.translate(unit.width(), 0)
-            self.view.repaint()
-        time.sleep(5)
+    def moveToNextCategory(self, unit):
+        if unit.display_state != DisplayState.SegmentCard:      # skips the first call from zoomToCategories
+            if unit.col < 5:
+                unit = self.category_displays[unit.col +1]
+                print("In moveToNextCategory (col, row) = ", "(" + str(unit.col) + ", " + str(unit.row) + ")")
+                end = unit.col * (unit.width() + self.gap) + unit.width()/2
+                start = end - (unit.width() + self.gap)
+                for frame in range(25):
+                    displacement = frame * ((unit.width() + self.gap)/24)
+                    self.view.centerOn(start + displacement, 0)
+                    self.view.repaint()
+                    time.sleep(0.0167)
+        time.sleep(0.75)
         unit.setDisplayState(DisplayState.A_Text)
+        self.stage_set.update(self.stage_set.sceneRect())
+        self.view.repaint()
         if unit.contents[self.game_segment.name]['B'] != "":
             time.sleep(3)
             unit.setDisplayState(DisplayState.B_Text)
-        if unit.col == 5:
+            self.stage_set.update(self.stage_set.sceneRect())
+            self.view.repaint()
+            time.sleep(3)
+        # todo: figure out how to require a click for moving past the last column
+        if unit.col >= 5:
+            for unit in self.category_displays:
+                unit.setDisplayState(DisplayState.A_Text)
             self.zoomOut()
             self.playMode = PlayMode.SelectClue
+        print("Got here!")
 
     def zoomToClue(self, unit):
         print("Got to zoomToClue()")
 
     def zoomIn(self, unit, col, row):
-        self.view.centerOn(col * (unit.width() + self.gap) + unit.width()/2,
-                           row * (unit.height() + self.gap) + unit.height()/2)
+        self.view.centerOn(col * (unit.width() + self.gap/2) + unit.width()/2,
+                           row * (unit.height() + self.gap/2) + unit.height()/2)
         for frame in range(25):
             self.view.resetTransform()
             zoom = 1 + (5 * frame)/24
