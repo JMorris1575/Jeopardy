@@ -62,7 +62,6 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
         self.createBoard(self.stage_set, display_unit_size, self.gap)
         # self.stage_set.setSceneRect(0, 0, 1000, 600)
         # self.view.fitInView(self.stage_set.itemsBoundingRect(), Qt.KeepAspectRatio)
-        print("in Jeopardy.__init__: self.view.sceneRect() = ", self.view.sceneRect())
 
     ###############################################################################################
     #                                                                                             #
@@ -386,6 +385,13 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
                 scene.addItem(element)
                 row_list.append(element)
             self.clue_displays.append(row_list)
+        rect = self.stage_set.itemsBoundingRect()
+        self.view.setSceneRect(rect.left()-self.gap, rect.top()-self.gap,
+                               rect.width()+2*self.gap, rect.height()+2*self.gap)
+        print('self.stage_set.itemsBoundingRect() = ', self.stage_set.itemsBoundingRect())
+        print('self.view.sceneRect = ', self.view.sceneRect())
+        print('self.centralWidget().rect() = ', self.centralWidget().rect())
+        print('self.rect() = ', self.rect())
 
     def resetBoard(self):
         """
@@ -568,7 +574,7 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
         if self.playMode == PlayMode.StartGame:
             self.zoomToCategories(self.category_displays[0], button)
         elif self.playMode == PlayMode.RevealCategories:
-            self.moveToNextCategory(unit)
+            self.revealCategory(unit)
         elif self.playMode == PlayMode.SelectClue:
             self.zoomToClue(unit)
         else:
@@ -577,37 +583,41 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
     def zoomToCategories(self, unit, button):
         self.zoomIn(unit, 0, 0)
         self.playMode = PlayMode.RevealCategories
-        self.moveToNextCategory(unit)       # or self.revealCategory(0) - yet to be written
+        self.revealCategory(unit)       # or self.revealCategory(0) - yet to be written
 
-    def moveToNextCategory(self, unit):
+    def revealCategory(self, unit):
         if unit.display_state != DisplayState.SegmentCard:      # skips the first call from zoomToCategories
-            if unit.col < 5:
-                unit = self.category_displays[unit.col +1]
-                print("In moveToNextCategory (col, row) = ", "(" + str(unit.col) + ", " + str(unit.row) + ")")
-                end = unit.col * (unit.width() + self.gap) + unit.width()/2
-                start = end - (unit.width() + self.gap)
-                for frame in range(25):
-                    displacement = frame * ((unit.width() + self.gap)/24)
-                    self.view.centerOn(start + displacement, 0)
-                    self.view.repaint()
-                    time.sleep(0.0167)
-        time.sleep(0.75)
-        unit.setDisplayState(DisplayState.A_Text)
-        self.stage_set.update(self.stage_set.sceneRect())
-        self.view.repaint()
-        if unit.contents[self.game_segment.name]['B'] != "":
-            time.sleep(3)
-            unit.setDisplayState(DisplayState.B_Text)
+            unit = self.moveToNextCategory(unit.col)
+        if unit != None:
+            time.sleep(0.75)
+            unit.setDisplayState(DisplayState.A_Text)
             self.stage_set.update(self.stage_set.sceneRect())
             self.view.repaint()
-            time.sleep(3)
-        # todo: figure out how to require a click for moving past the last column
-        if unit.col >= 5:
-            for unit in self.category_displays:
-                unit.setDisplayState(DisplayState.A_Text)
+            if unit.contents[self.game_segment.name]['B'] != "":
+                time.sleep(2)
+                unit.setDisplayState(DisplayState.B_Text)
+                self.stage_set.update(self.stage_set.sceneRect())
+                self.view.repaint()
+        else:                                                   # all categories have been displayed
             self.zoomOut()
             self.playMode = PlayMode.SelectClue
-        print("Got here!")
+
+    def moveToNextCategory(self, col):
+        if col < 5:
+            unit = self.category_displays[col + 1]
+            print("In moveToNextCategory (col, row) = ", "(" + str(unit.col) + ", " + str(unit.row) + ")")
+            end = unit.col * (unit.width() + self.gap) + unit.width() / 2
+            start = end - (unit.width() + self.gap)
+            for frame in range(25):
+                displacement = frame * ((unit.width() + self.gap) / 24)
+                self.view.centerOn(start + displacement, 0)
+                self.view.repaint()
+                time.sleep(0.0167)
+            return unit
+        else:
+            for unit in self.category_displays:
+                unit.setDisplayState(DisplayState.A_Text)
+            return None
 
     def zoomToClue(self, unit):
         print("Got to zoomToClue()")
@@ -623,6 +633,7 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
             self.view.repaint()
 
     def zoomOut(self):
+        self.view.centerOn(200, 200)
         self.view.scale(0.167, 0.167)
 
 
