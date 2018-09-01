@@ -59,9 +59,13 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
         # calculate the gap between display units (5% of the width of the unit)
         self.gap = display_unit_size.width()/20
 
+        self.category_displays = []
+        self.clue_displays = []
+
         self.createBoard(self.stage_set, display_unit_size, self.gap)
         # self.stage_set.setSceneRect(0, 0, 1000, 600)
         # self.view.fitInView(self.stage_set.itemsBoundingRect(), Qt.KeepAspectRatio)
+
 
     ###############################################################################################
     #                                                                                             #
@@ -358,7 +362,9 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
     def createBoard(self, scene, size, gap):
         """
         Creates a blank Jeopardy board for later use
+        :param scene: QGraphicsScene being used
         :param size: QFSize telling the width and height of the display units for this screen
+        :param gap: the gap between the screens on the board
         :return: None
         """
 
@@ -385,13 +391,15 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
                 scene.addItem(element)
                 row_list.append(element)
             self.clue_displays.append(row_list)
-        rect = self.stage_set.itemsBoundingRect()
-        self.view.setSceneRect(rect.left()-self.gap, rect.top()-self.gap,
-                               rect.width()+2*self.gap, rect.height()+2*self.gap)
-        print('self.stage_set.itemsBoundingRect() = ', self.stage_set.itemsBoundingRect())
-        print('self.view.sceneRect = ', self.view.sceneRect())
-        print('self.centralWidget().rect() = ', self.centralWidget().rect())
-        print('self.rect() = ', self.rect())
+        # rect = self.stage_set.itemsBoundingRect()
+        # self.view.setSceneRect(rect.left()-self.gap, rect.top()-self.gap,
+        #                        rect.width()+2*self.gap, rect.height()+2*self.gap)
+        # print('self.stage_set.itemsBoundingRect() = ', self.stage_set.itemsBoundingRect())
+        # print('self.view.rect() = ', self.view.rect())
+        # print('self.view.sceneRect() = ', self.view.sceneRect())
+        # print('self.centralWidget().rect() = ', self.centralWidget().rect())
+        # print('self.rect() = ', self.rect())
+        # print('self.size() = ', self.size())
 
     def resetBoard(self):
         """
@@ -533,8 +541,12 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
             unit.displayed_text = "Please load or create a game."
         else:
             unit.displayed_text = "Unknown program_mode in mousePressProcessing"
-
-
+        # print('self.stage_set.itemsBoundingRect() = ', self.stage_set.itemsBoundingRect())
+        # print('self.view.rect() = ', self.view.rect())
+        # print('self.view.sceneRect() = ', self.view.sceneRect())
+        # print('self.centralWidget().rect() = ', self.centralWidget().rect())
+        # print('self.rect() = ', self.rect())
+        # print('self.size() = ', self.size())
 
     def editGameElement(self, unit, button):
         """
