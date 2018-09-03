@@ -276,3 +276,51 @@ Is that so bad? Right now I've got the fonts defined in ``jeopardy.py``, maybe t
 ``graphic_objects.py``. Why should the main program have to bother its pretty head about such things. It just needs to
 be able to tell it what to display. How it gets displayed is the DisplayUnit's job.
 
+Rethinking My Whole Approach
+============================
+
+In working through chapter 8 of *Front-End Web Development - The Big Nerd Ranch Guide*, which is the book that inspired
+my original desire to use the Model/View/Controller (MVC) pattern, I realized I haven't been doing a very good job
+keeping the implementation of the view out of the controller. The controller should only have to care about controlling
+how the game is edited and played. It should not have to know any details about how its instructions get carried out.
+
+I should be able to edit or play a whole game, albeit in a not-so-snazzy way, simply by sending commands from the
+controller and having text displayed in the console -- something like the ``myTruck`` controller could be used and
+tested in the browser console. The user interface (UI) elements, too, should be in a separate place from the controller.
+
+This means I will have to rethink my whole approach. I think I will be able to use much of what I have already
+developed, but this may help me think more carefully through the calls the controller will need to make when it gets
+signals from the UI. I should probably diagram what each part will be doing.
+
+But first I may need to think about what I want each component to do and how they will interact with one another in
+chart form. That may help me figure out how best to arrange the relationships between the three parts of the program.
+Right now I am wondering if there is a difference between the user's interaction with the menu system and his or her
+interaction with the game elements. I think I keep trying to put "controller" aspects into the "view" component.
+
+Here is a working chart:
+
+**Model**
+
+* This includes the category titles and explanations, the clues and correct responses and groups the clues into their
+  categories. There may also be a component of the settings for this game: points or dollars, time frames, etc.
+* What should the models be able to do and which other components are connected to them?
+
+**View**
+
+* The view displays the board, the scoreboards and the timing lights
+* Should it also be where user interaction takes place?
+
+**Controller**
+
+* This part of the program should operate oblivious to the workings of the other two parts -- at least as far as the
+  implementation is concerned.
+* When signalling that it wants to have the categories displayed it should not care HOW the categories are displayed,
+  only that it gets done and, when it gets done, it can go on to the next phase of the game.
+* This seems to imply that the user action that calls for the start of a game, or a segment of a game,should inform the
+  controller which then sends a command to display the categories.
+
+So far I'm only convinced that I don't have a clear idea of how I want this program to be structured. Perhaps I need to
+play with it some more, perhaps trying to build a controller that knows nothing at all about the implementation or
+perhaps write a version of the program that plays out only in text. 
+
+
