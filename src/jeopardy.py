@@ -38,9 +38,9 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
         else:
             self.category_font = QFont("Arial", 16)
             self.number_font = QFont("Arial", 32, QFont.Bold)
-        self.clue_font_id = self.font_database.addApplicationFont("../fonts/FjallaOne-Regular.ttf")
+        self.clue_font_id = self.font_database.addApplicationFont("../fonts/MouseMemoirs-Regular.ttf")
         if self.clue_font_id != -1:
-            self.clue_font = QFont("Fjalla One", 12)
+            self.clue_font = QFont("Mouse Memoirs", 14)
         else:
             self.clue_font = QFont("Times New Roman", 12)
         #self.number_font = QFont("Arial", 32, QFont.Bold)
