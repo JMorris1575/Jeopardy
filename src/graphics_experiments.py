@@ -37,6 +37,7 @@ class ZoomDialog(QDialog):
         layout.addItem(rowSpin, 1, 1)
         layout.addItem(zoomButton, 2, 0)
         layout.addItem(exitButton, 2, 1)
+        self.setLayout(layout)
 
     def zoom_click(self):
         print("Got to zoom_click().")
@@ -44,7 +45,6 @@ class ZoomDialog(QDialog):
     def exit_click(self):
         print("Got to exit_click().")
 
-        self.setLayout(layout)
 
 class GraphicsTester(QMainWindow):
 
@@ -62,7 +62,14 @@ class GraphicsTester(QMainWindow):
         self.view = QGraphicsView()
         self.view.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.view.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.inner_view = QGraphicsView()
+        self.inner_scene = QGraphicsScene()
+        inner_rect = QGraphicsRectItem(0, 0, 160, 90)
+        inner_rect.setPos(10, 100)
+        self.inner_scene.addItem(inner_rect)
+        self.inner_view.setScene(self.inner_scene)
         self.scene = QGraphicsScene()
+        self.scene.addWidget(self.inner_view)
         self.view.setScene(self.scene)
         self.setCentralWidget(self.view)
         self.Setup()

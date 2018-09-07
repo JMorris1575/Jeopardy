@@ -142,6 +142,7 @@ class JeopardyUI(object):
 
         self.stage_set = QGraphicsScene()
         self.stage_set.setBackgroundBrush(Qt.black)
+        # self.stage_set.setSceneRect(-8, -8, 1016, 604)
 
         self.view = QGraphicsView()
         self.view.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
@@ -151,3 +152,4 @@ class JeopardyUI(object):
         self.view.setViewportUpdateMode(QGraphicsView.FullViewportUpdate)
 
         self.setCentralWidget(self.view)
+        self.centralWidget().setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
