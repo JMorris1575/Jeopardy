@@ -43,7 +43,7 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
             self.clue_font = QFont("Fjalla One", 12)
         else:
             self.clue_font = QFont("Times New Roman", 12)
-        self.number_font = QFont("Arial", 32, QFont.Bold)
+        #self.number_font = QFont("Arial", 32, QFont.Bold)
 
         self.base_amount = 200                  # the smallest number of dollars or points
                                                 # by using this variable you can opt to change it later

@@ -112,7 +112,7 @@ class DisplayUnit(QGraphicsItem):
         # now deal with the fonts and colors of the clue units
         if self.type == DisplayType.Clue:
             if self.display_state == DisplayState.Dollars or self.display_state == DisplayState.Points:
-                self._text_item.setDefaultTextColor(QColor(255, 162, 78, 255))
+                self._text_item.setDefaultTextColor(QColor(255, 182, 78, 255))
                 self.font = self.controller.number_font
             else:
                 self._text_item.setDefaultTextColor(QColor(Qt.white))
