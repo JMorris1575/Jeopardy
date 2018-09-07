@@ -31,10 +31,10 @@ class Jeopardy(QMainWindow, jeopardy_ui.JeopardyUI):
 
         # define the fonts to be used for the various types of display
         self.font_database = QFontDatabase()
-        self.category_font_id = self.font_database.addApplicationFont("../fonts/Oswald-Bold.ttf")
+        self.category_font_id = self.font_database.addApplicationFont("../fonts/Anton-Regular.ttf")
         if self.category_font_id != -1:
-            self.category_font = QFont("Oswald", 16)
-            self.number_font = QFont("Oswald", 32)
+            self.category_font = QFont("Anton", 16)
+            self.number_font = QFont("Anton", 32)
         else:
             self.category_font = QFont("Arial", 16)
             self.number_font = QFont("Arial", 32, QFont.Bold)
